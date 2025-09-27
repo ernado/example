@@ -12,7 +12,7 @@ jobs:
   dependency-review:
     runs-on: ubuntu-latest
     env:
-      FIRST_COMMIT_SHA: 95edd654ef054ca4372dc7e27efff03c0a5ee1de
+      FIRST_COMMIT_SHA: f30ac982d308575bbc5decdb02e5af93c83e8808
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
