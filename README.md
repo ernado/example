@@ -12,26 +12,25 @@ curl -sSf https://atlasgo.sh | sh
 
 ## Structure
 
-
 | File/Directory       | Description                                                         |
 |----------------------|---------------------------------------------------------------------|
 | `.github/`           | GitHub workflows and configurations                                 |
+| `_oas`               | OpenAPI specifications                                              |
 | `cmd/`               | Main applications                                                   |
-| `internal/`          | Private application and library code. Most code **SHOULD** be here. |
 | `pkg/`               | Directory that **MUST NOT** exist                                   |
-| `.codecov.yml`       | Codecov configuration                                               |
+| `internal/`          | Private application and library code. Most code **SHOULD** be here. |
 | `.golangci.yml`      | GolangCI-Lint configuration                                         |
+| `.codecov.yml`       | Codecov configuration                                               |
 | `.editorconfig`      | Editor configuration                                                |
 | `Dockerfile`         | Dockerfile for building the application                             |
-| `go.mod`             | Go module definition. Tools are defined here.                       |
-| `go.sum`             | Go module checksums                                                 |
+| `LICENSE`            | License file                                                        |
 | `Makefile`           | Makefile with common commands                                       |
 | `README.md`          | This file                                                           |
-| `LICENSE`            | License file                                                        |
-| `go.coverage.sh`     | Script to generate coverage report                                  |
-| `_oas`               | OpenAPI specifications                                              |
-| `go.test.sh`         | Script to run tests                                                 |
 | `generate.go`        | Code generation entrypoint                                          |
+| `go.coverage.sh`     | Script to generate coverage report                                  |
+| `go.mod`             | Go module definition. Tools are defined here.                       |
+| `go.sum`             | Go module checksums                                                 |
+| `go.test.sh`         | Script to run tests                                                 |
 | `migrate.Dockerfile` | Docker file for ent migrations                                      |
 
 ### .github
