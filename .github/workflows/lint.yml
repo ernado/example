@@ -40,7 +40,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-go-
 
       - name: Run `go mod tidy`
-        run: make tidy_all
+        run: make tidy
 
       - name: Check git diff
         id: git-diff
