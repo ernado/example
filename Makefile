@@ -20,6 +20,3 @@ generate:
 
 lint-openapi:
 	go tool vacuum lint -d _oas/openapi.yaml
-
-tidy:
-	go mod tidy
