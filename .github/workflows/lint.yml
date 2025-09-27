@@ -46,17 +46,6 @@ jobs:
         id: git-diff
         run: git diff --exit-code
 
-  go-mod-tidy:
-    if: ${{ always() && github.event.pull_request.user.login == 'dependabot[bot]' && needs.check-mod.result == 'failure' && needs.check-mod.git-diff.outcome != 'success' }}
-    uses: ./.github/workflows/tidy-autocommit.yml
-    needs: [check-mod]
-    secrets:
-      APP_ID: ${{ secrets.APP_ID }}
-      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-    with:
-      repository: ${{ github.event.pull_request.head.repo.full_name }}
-      ref: ${{ github.event.pull_request.head.ref }}
-
   # Check if there are any dirty changes after go generate
   check-generate:
     runs-on: ubuntu-latest
