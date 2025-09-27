@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/ernado/example/internal/oas"
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/app"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
@@ -18,10 +20,20 @@ func Client() *cobra.Command {
 		Use: "client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app.Run(func(ctx context.Context, lg *zap.Logger, t *app.Telemetry) error {
-				// TODO: Instrument http client with OpenTelemetry.
+				httpTransport := otelhttp.NewTransport(
+					http.DefaultTransport,
+					otelhttp.WithPropagators(t.TextMapPropagator()),
+					otelhttp.WithTracerProvider(t.TracerProvider()),
+					otelhttp.WithMeterProvider(t.MeterProvider()),
+				)
+				httpClient := &http.Client{
+					Transport: httpTransport,
+					Timeout:   time.Second * 10,
+				}
 				client, err := oas.NewClient("http://server:8080",
 					oas.WithMeterProvider(t.MeterProvider()),
 					oas.WithTracerProvider(t.TracerProvider()),
+					oas.WithClient(httpClient),
 				)
 				if err != nil {
 					return errors.Wrap(err, "create client")

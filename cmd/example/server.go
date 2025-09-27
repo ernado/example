@@ -14,6 +14,7 @@ import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/app"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
@@ -60,10 +61,20 @@ func Server() *cobra.Command {
 					return errors.Wrap(err, "create server")
 				}
 
-				// TODO: Instrument with OpenTelemetry.
 				svc := &http.Server{
-					Handler:           s,
-					Addr:              ":8080",     // TODO: configure
+					Handler: otelhttp.NewHandler(s, "",
+						otelhttp.WithPropagators(t.TextMapPropagator()),
+						otelhttp.WithMeterProvider(t.MeterProvider()),
+						otelhttp.WithTracerProvider(t.TracerProvider()),
+						otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+							op, ok := s.FindPath(r.Method, r.URL)
+							if ok {
+								return "http" + "." + op.OperationID()
+							}
+							return operation
+						}),
+					),
+					Addr:              ":8080",
 					ReadHeaderTimeout: time.Second, // Prevent Slowloris attacks.
 					BaseContext: func(_ net.Listener) context.Context {
 						// NB: Using BaseContext is important to properly execute graceful shutdown.

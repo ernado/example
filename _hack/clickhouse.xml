@@ -14,7 +14,6 @@
         <asynchronous_metrics>true</asynchronous_metrics>
     </prometheus>
     <opentelemetry_span_log>
-        <!-- TODO(ernado): add exporter -->
         <!--
             The default table creation code is insufficient, this <engine> spec
             is a workaround. There is no 'event_time' for this log, but two times,

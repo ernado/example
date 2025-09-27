@@ -44,7 +44,6 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
       - OTEL_RESOURCE_ATTRIBUTES=service.name=go-faster.example.client
 
-
   clickhouse:
     image: "ghcr.io/go-faster/clickhouse-server:23.12"
     volumes:
@@ -61,13 +60,9 @@ services:
       - OTELDB_STORAGE=ch
       - CH_DSN=clickhouse://clickhouse:9000
       - OTEL_LOG_LEVEL=info
-      - OTEL_METRICS_EXPORTER=otlp
-      - OTEL_LOGS_EXPORTER=otlp
-      - OTEL_TRACES_EXPORTER=otlp
-      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-      - OTEL_EXPORTER_OTLP_INSECURE=true
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=go-faster.oteldb
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_TRACES_EXPORTER=none
     depends_on:
       - clickhouse
 
@@ -103,7 +98,6 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./_hack/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./_hack/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
       - ./_hack/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/default.yml
       - ./_hack/grafana/dashboards:/etc/grafana/dashboards:ro
