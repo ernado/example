@@ -5,6 +5,7 @@ Example project with best practices.
 | Dependency type | Tool/Library                                      | Description                                    |
 |-----------------|---------------------------------------------------|------------------------------------------------|
 | Runtime         | [go-faster/sdk](https://github.com/go-faster/sdk) | Application SDK with logging, metrics, tracing |
+| Error handling  | [go-faster/errors](github.com/go-faster/errors)   | Error wrapping and handling                    |
 | ORM             | [ent](https://entgo.io/)                          | Entity framework for Go                        |
 | Migrations      | [atlas](https://atlasgo.io/)                      | Database schema migrations and management      |
 | Database        | [PostgreSQL](http://postgresql.org/) 18           | Reliable relational database                   |
@@ -40,6 +41,7 @@ curl -sSf https://atlasgo.sh | sh
 | `go.sum`             | Go module checksums                                                 |
 | `go.test.sh`         | Script to run tests                                                 |
 | `migrate.Dockerfile` | Docker file for ent migrations                                      |
+| `.rules.md`          | Rules for LLMs                                                      |
 
 ### .github
 
