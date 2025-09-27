@@ -19,6 +19,10 @@ Example project with best practices.
 curl -sSf https://atlasgo.sh | sh
 ```
 
+## Commits
+
+We are using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
 ## Structure
 
 | File/Directory       | Description                                                                          |
