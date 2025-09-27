@@ -181,7 +181,7 @@ Pros
 Cons:
 - More boilerplate code
 
-### In-place
+### Direct
 
 Just handlers with business logic and ent client usage.
 
