@@ -1,1 +1,1 @@
-.rules.md
+.github/copilot-instructions.md
