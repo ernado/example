@@ -2,6 +2,7 @@ package entdb
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
 
@@ -24,8 +25,13 @@ type DBTestSuite struct {
 }
 
 func (suite *DBTestSuite) SetupSuite() {
+	// Skip if running on non-linux architecture.
 	ctx := suite.T().Context()
-
+	if runtime.GOOS != "linux" {
+		// TODO: support macos with colima.
+		suite.T().Skip("Skipping test on non-linux architecture")
+		return
+	}
 	const (
 		dbName     = "test_db"
 		dbUser     = "test_user"
