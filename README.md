@@ -2,6 +2,14 @@
 
 Example project with best practices.
 
+| Dependency type | Tool/Library                                      | Description                                    |
+|-----------------|---------------------------------------------------|------------------------------------------------|
+| Runtime         | [go-faster/sdk](https://github.com/go-faster/sdk) | Application SDK with logging, metrics, tracing |
+| ORM             | [ent](https://entgo.io/)                          | Entity framework for Go                        |
+| Migrations      | [atlas](https://atlasgo.io/)                      | Database schema migrations and management      |
+| Database        | [PostgreSQL](http://postgresql.org/) 18           | Reliable relational database                   |
+| OpenAPI codegen | [ogen](https://ogen.dev/)                         | OpenAPI v3 code generator for Go               |
+
 ## Installation
 
 ### atlas
