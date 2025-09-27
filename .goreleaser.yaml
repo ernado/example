@@ -1,0 +1,217 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+version: 2
+project_name: example
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - riscv64
+    main: ./cmd/example
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+
+archives:
+  - name_template: >-
+      {{ .ProjectName }}-
+      {{- .Os }}-
+      {{- .Arch  }}
+    format_overrides:
+      - goos: windows
+        formats: [ zip ]
+    builds_info:
+      group: root
+      owner: root
+    files:
+      - README.md
+      - LICENSE
+      - cosign.pub
+
+release:
+  mode: replace
+  draft: false
+  prerelease: auto
+
+  # Templates: allowed
+  footer: |
+    ## Docker images
+
+    ```
+    {{ .Env.IMAGE }}:{{ .Version }}
+    ```
+
+  github:
+    owner: ernado
+    name: example
+
+  extra_files:
+    - glob: "cosign.pub"
+
+dockers:
+  # https://goreleaser.com/customization/docker/
+  - use: buildx
+    goos: linux
+    goarch: amd64
+    image_templates:
+      - "{{ .Env.IMAGE }}:{{ .Version }}-amd64"
+      - "{{ .Env.IMAGE }}:latest-amd64"
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--pull"
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/ernado/example/main/README.md"
+      - "--label=io.artifacthub.package.logo-url=https://avatars.githubusercontent.com/u/93744681?"
+      - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Aleksandr Razumov\",\"email\":\"ernado@go-faster.org\"}]"
+      - "--label=io.artifacthub.package.license=Apache 2.0"
+      - "--label=org.opencontainers.image.description=Observability sumulation services"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - use: buildx
+    goos: linux
+    goarch: arm64
+    image_templates:
+      - "{{ .Env.IMAGE }}:{{ .Version }}-arm64"
+      - "{{ .Env.IMAGE }}:latest-arm64"
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--pull"
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/ernado/example/main/README.md"
+      - "--label=io.artifacthub.package.logo-url=https://avatars.githubusercontent.com/u/93744681?"
+      - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Aleksandr Razumov\",\"email\":\"ernado@go-faster.org\"}]"
+      - "--label=io.artifacthub.package.license=Apache 2.0"
+      - "--label=org.opencontainers.image.description=Observability sumulation services"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - use: buildx
+    goos: linux
+    goarch: riscv64
+    image_templates:
+      - "{{ .Env.IMAGE }}:{{ .Version }}-riscv64"
+      - "{{ .Env.IMAGE }}:latest-riscv64"
+    build_flag_templates:
+      - "--platform=linux/riscv64"
+      - "--pull"
+      # riscv64 architecture support for static images
+      # https://github.com/go-riscv/distroless
+      # https://github.com/GoogleContainerTools/distroless/issues/1269
+      - "--build-arg"
+      - "IMG=ghcr.io/go-riscv/distroless/static-unstable"
+      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/ernado/example/main/README.md"
+      - "--label=io.artifacthub.package.logo-url=https://avatars.githubusercontent.com/u/93744681?"
+      - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Aleksandr Razumov\",\"email\":\"ernado@go-faster.org\"}]"
+      - "--label=io.artifacthub.package.license=Apache 2.0"
+      - "--label=org.opencontainers.image.description=Observability sumulation services"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"
+docker_manifests:
+  # https://goreleaser.com/customization/docker_manifest/
+  - name_template: "{{ .Env.IMAGE }}:{{ .Version }}"
+    image_templates:
+      - "{{ .Env.IMAGE }}:{{ .Version }}-amd64"
+      - "{{ .Env.IMAGE }}:{{ .Version }}-arm64"
+      - "{{ .Env.IMAGE }}:{{ .Version }}-riscv64"
+  - name_template: "{{ .Env.IMAGE }}:latest"
+    image_templates:
+      - "{{ .Env.IMAGE }}:latest-amd64"
+      - "{{ .Env.IMAGE }}:latest-arm64"
+      - "{{ .Env.IMAGE }}:latest-riscv64"
+
+docker_signs:
+  - cmd: cosign
+    artifacts: manifests
+    output: true
+    args:
+      - '--key'
+      - 'env://COSIGN_PRIVATE_KEY'
+      - 'sign'
+      - '${artifact}@${digest}'
+      - --yes
+
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^test:'
+      - '^chore'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+      - go mod tidy
+  groups:
+    - title: 'Helm chart updates'
+      order: 700
+      regexp: '^.*?(feat|fix|chore)\(helm\)!?:.+$'
+    - title: 'Dependency updates'
+      regexp: '^.*?(feat|fix|chore)\(deps\)!?:.+$'
+      order: 300
+    - title: 'New Features'
+      regexp: '^.*?feat(\(\S+\))??!?:.+$'
+      order: 100
+    - title: 'Security updates'
+      regexp: '^.*?sec(\(\S+\))??!?:.+$'
+      order: 150
+    - title: 'Performance updates'
+      regexp: '^.*?perf(\(\S+\))??!?:.+$'
+      order: 250
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\(\S+\))??!?:.+$'
+      order: 200
+    - title: 'Documentation updates'
+      regexp: '^.*?docs(\(\S+\))??!?:.+$'
+      order: 400
+    - title: 'Benchmarking tooling changes'
+      regexp: '^.*?(\(\S*bench\S*\))!?:.+$'
+      order: 450
+    - title: 'Build process updates'
+      regexp: '^.*?build(\(\S+\))??!?:.+$'
+      order: 500
+    - title: 'CI/CD updates'
+      regexp: '^.*?ci(\(\S+\))??!?:.+$'
+      order: 600
+    - title: 'Updates to tests'
+      regexp: '^.*?test(\(\S+\))??!?:.+$'
+      order: 600
+
+    - title: Other work
+      order: 9999
+
+sboms:
+  - artifacts: archive
+
+nfpms:
+  - package_name: example
+    homepage: https://github.com/ernado/example
+    maintainer: Aleksandr Razumov <ernado@go-faster.org>
+    description: Example project
+    license: Apache 2.0
+    formats:
+      - apk
+      - deb
+      - rpm
+      - archlinux
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
