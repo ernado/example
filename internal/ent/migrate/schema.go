@@ -8,34 +8,20 @@ import (
 )
 
 var (
-	// TelegramChannelsColumns holds the columns for the "telegram_channels" table.
-	TelegramChannelsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "access_hash", Type: field.TypeInt64},
-		{Name: "title", Type: field.TypeString},
-		{Name: "active", Type: field.TypeBool},
-	}
-	// TelegramChannelsTable holds the schema information for the "telegram_channels" table.
-	TelegramChannelsTable = &schema.Table{
-		Name:       "telegram_channels",
-		Columns:    TelegramChannelsColumns,
-		PrimaryKey: []*schema.Column{TelegramChannelsColumns[0]},
-	}
-	// TelegramSessionsColumns holds the columns for the "telegram_sessions" table.
-	TelegramSessionsColumns = []*schema.Column{
+	// TasksColumns holds the columns for the "tasks" table.
+	TasksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "data", Type: field.TypeBytes},
+		{Name: "title", Type: field.TypeString},
 	}
-	// TelegramSessionsTable holds the schema information for the "telegram_sessions" table.
-	TelegramSessionsTable = &schema.Table{
-		Name:       "telegram_sessions",
-		Columns:    TelegramSessionsColumns,
-		PrimaryKey: []*schema.Column{TelegramSessionsColumns[0]},
+	// TasksTable holds the schema information for the "tasks" table.
+	TasksTable = &schema.Table{
+		Name:       "tasks",
+		Columns:    TasksColumns,
+		PrimaryKey: []*schema.Column{TasksColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		TelegramChannelsTable,
-		TelegramSessionsTable,
+		TasksTable,
 	}
 )
 

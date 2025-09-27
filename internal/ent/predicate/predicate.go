@@ -6,8 +6,5 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// TelegramChannel is the predicate function for telegramchannel builders.
-type TelegramChannel func(*sql.Selector)
-
-// TelegramSession is the predicate function for telegramsession builders.
-type TelegramSession func(*sql.Selector)
+// Task is the predicate function for task builders.
+type Task func(*sql.Selector)

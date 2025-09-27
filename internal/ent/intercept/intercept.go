@@ -9,8 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ernado/example/internal/ent"
 	"github.com/ernado/example/internal/ent/predicate"
-	"github.com/ernado/example/internal/ent/telegramchannel"
-	"github.com/ernado/example/internal/ent/telegramsession"
+	"github.com/ernado/example/internal/ent/task"
 )
 
 // The Query interface represents an operation that queries a graph.
@@ -69,67 +68,38 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 	return f(ctx, query)
 }
 
-// The TelegramChannelFunc type is an adapter to allow the use of ordinary function as a Querier.
-type TelegramChannelFunc func(context.Context, *ent.TelegramChannelQuery) (ent.Value, error)
+// The TaskFunc type is an adapter to allow the use of ordinary function as a Querier.
+type TaskFunc func(context.Context, *ent.TaskQuery) (ent.Value, error)
 
 // Query calls f(ctx, q).
-func (f TelegramChannelFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.TelegramChannelQuery); ok {
+func (f TaskFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.TaskQuery); ok {
 		return f(ctx, q)
 	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TelegramChannelQuery", q)
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TaskQuery", q)
 }
 
-// The TraverseTelegramChannel type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseTelegramChannel func(context.Context, *ent.TelegramChannelQuery) error
+// The TraverseTask type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseTask func(context.Context, *ent.TaskQuery) error
 
 // Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseTelegramChannel) Intercept(next ent.Querier) ent.Querier {
+func (f TraverseTask) Intercept(next ent.Querier) ent.Querier {
 	return next
 }
 
 // Traverse calls f(ctx, q).
-func (f TraverseTelegramChannel) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.TelegramChannelQuery); ok {
+func (f TraverseTask) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TaskQuery); ok {
 		return f(ctx, q)
 	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.TelegramChannelQuery", q)
-}
-
-// The TelegramSessionFunc type is an adapter to allow the use of ordinary function as a Querier.
-type TelegramSessionFunc func(context.Context, *ent.TelegramSessionQuery) (ent.Value, error)
-
-// Query calls f(ctx, q).
-func (f TelegramSessionFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.TelegramSessionQuery); ok {
-		return f(ctx, q)
-	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TelegramSessionQuery", q)
-}
-
-// The TraverseTelegramSession type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseTelegramSession func(context.Context, *ent.TelegramSessionQuery) error
-
-// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseTelegramSession) Intercept(next ent.Querier) ent.Querier {
-	return next
-}
-
-// Traverse calls f(ctx, q).
-func (f TraverseTelegramSession) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.TelegramSessionQuery); ok {
-		return f(ctx, q)
-	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.TelegramSessionQuery", q)
+	return fmt.Errorf("unexpected query type %T. expect *ent.TaskQuery", q)
 }
 
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
-	case *ent.TelegramChannelQuery:
-		return &query[*ent.TelegramChannelQuery, predicate.TelegramChannel, telegramchannel.OrderOption]{typ: ent.TypeTelegramChannel, tq: q}, nil
-	case *ent.TelegramSessionQuery:
-		return &query[*ent.TelegramSessionQuery, predicate.TelegramSession, telegramsession.OrderOption]{typ: ent.TypeTelegramSession, tq: q}, nil
+	case *ent.TaskQuery:
+		return &query[*ent.TaskQuery, predicate.Task, task.OrderOption]{typ: ent.TypeTask, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

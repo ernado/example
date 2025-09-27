@@ -12,8 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/ernado/example/internal/ent/telegramchannel"
-	"github.com/ernado/example/internal/ent/telegramsession"
+	"github.com/ernado/example/internal/ent/task"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -74,8 +73,7 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			telegramchannel.Table: telegramchannel.ValidColumn,
-			telegramsession.Table: telegramsession.ValidColumn,
+			task.Table: task.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

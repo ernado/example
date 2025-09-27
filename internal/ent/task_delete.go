@@ -9,29 +9,29 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ernado/example/internal/ent/predicate"
-	"github.com/ernado/example/internal/ent/telegramchannel"
+	"github.com/ernado/example/internal/ent/task"
 )
 
-// TelegramChannelDelete is the builder for deleting a TelegramChannel entity.
-type TelegramChannelDelete struct {
+// TaskDelete is the builder for deleting a Task entity.
+type TaskDelete struct {
 	config
 	hooks    []Hook
-	mutation *TelegramChannelMutation
+	mutation *TaskMutation
 }
 
-// Where appends a list predicates to the TelegramChannelDelete builder.
-func (_d *TelegramChannelDelete) Where(ps ...predicate.TelegramChannel) *TelegramChannelDelete {
+// Where appends a list predicates to the TaskDelete builder.
+func (_d *TaskDelete) Where(ps ...predicate.Task) *TaskDelete {
 	_d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (_d *TelegramChannelDelete) Exec(ctx context.Context) (int, error) {
+func (_d *TaskDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *TelegramChannelDelete) ExecX(ctx context.Context) int {
+func (_d *TaskDelete) ExecX(ctx context.Context) int {
 	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -39,8 +39,8 @@ func (_d *TelegramChannelDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (_d *TelegramChannelDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(telegramchannel.Table, sqlgraph.NewFieldSpec(telegramchannel.FieldID, field.TypeInt64))
+func (_d *TaskDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(task.Table, sqlgraph.NewFieldSpec(task.FieldID, field.TypeInt))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,32 +56,32 @@ func (_d *TelegramChannelDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// TelegramChannelDeleteOne is the builder for deleting a single TelegramChannel entity.
-type TelegramChannelDeleteOne struct {
-	_d *TelegramChannelDelete
+// TaskDeleteOne is the builder for deleting a single Task entity.
+type TaskDeleteOne struct {
+	_d *TaskDelete
 }
 
-// Where appends a list predicates to the TelegramChannelDelete builder.
-func (_d *TelegramChannelDeleteOne) Where(ps ...predicate.TelegramChannel) *TelegramChannelDeleteOne {
+// Where appends a list predicates to the TaskDelete builder.
+func (_d *TaskDeleteOne) Where(ps ...predicate.Task) *TaskDeleteOne {
 	_d._d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query.
-func (_d *TelegramChannelDeleteOne) Exec(ctx context.Context) error {
+func (_d *TaskDeleteOne) Exec(ctx context.Context) error {
 	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{telegramchannel.Label}
+		return &NotFoundError{task.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *TelegramChannelDeleteOne) ExecX(ctx context.Context) {
+func (_d *TaskDeleteOne) ExecX(ctx context.Context) {
 	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}

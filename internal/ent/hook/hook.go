@@ -9,28 +9,16 @@ import (
 	"github.com/ernado/example/internal/ent"
 )
 
-// The TelegramChannelFunc type is an adapter to allow the use of ordinary
-// function as TelegramChannel mutator.
-type TelegramChannelFunc func(context.Context, *ent.TelegramChannelMutation) (ent.Value, error)
+// The TaskFunc type is an adapter to allow the use of ordinary
+// function as Task mutator.
+type TaskFunc func(context.Context, *ent.TaskMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f TelegramChannelFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TelegramChannelMutation); ok {
+func (f TaskFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TaskMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TelegramChannelMutation", m)
-}
-
-// The TelegramSessionFunc type is an adapter to allow the use of ordinary
-// function as TelegramSession mutator.
-type TelegramSessionFunc func(context.Context, *ent.TelegramSessionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f TelegramSessionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TelegramSessionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TelegramSessionMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TaskMutation", m)
 }
 
 // Condition is a hook condition function.

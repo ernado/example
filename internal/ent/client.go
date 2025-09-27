@@ -14,8 +14,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ernado/example/internal/ent/telegramchannel"
-	"github.com/ernado/example/internal/ent/telegramsession"
+	"github.com/ernado/example/internal/ent/task"
 )
 
 // Client is the client that holds all ent builders.
@@ -23,10 +22,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// TelegramChannel is the client for interacting with the TelegramChannel builders.
-	TelegramChannel *TelegramChannelClient
-	// TelegramSession is the client for interacting with the TelegramSession builders.
-	TelegramSession *TelegramSessionClient
+	// Task is the client for interacting with the Task builders.
+	Task *TaskClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -38,8 +35,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.TelegramChannel = NewTelegramChannelClient(c.config)
-	c.TelegramSession = NewTelegramSessionClient(c.config)
+	c.Task = NewTaskClient(c.config)
 }
 
 type (
@@ -130,10 +126,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		TelegramChannel: NewTelegramChannelClient(cfg),
-		TelegramSession: NewTelegramSessionClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		Task:   NewTaskClient(cfg),
 	}, nil
 }
 
@@ -151,17 +146,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		TelegramChannel: NewTelegramChannelClient(cfg),
-		TelegramSession: NewTelegramSessionClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		Task:   NewTaskClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		TelegramChannel.
+//		Task.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -183,130 +177,126 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.TelegramChannel.Use(hooks...)
-	c.TelegramSession.Use(hooks...)
+	c.Task.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.TelegramChannel.Intercept(interceptors...)
-	c.TelegramSession.Intercept(interceptors...)
+	c.Task.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *TelegramChannelMutation:
-		return c.TelegramChannel.mutate(ctx, m)
-	case *TelegramSessionMutation:
-		return c.TelegramSession.mutate(ctx, m)
+	case *TaskMutation:
+		return c.Task.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
 }
 
-// TelegramChannelClient is a client for the TelegramChannel schema.
-type TelegramChannelClient struct {
+// TaskClient is a client for the Task schema.
+type TaskClient struct {
 	config
 }
 
-// NewTelegramChannelClient returns a client for the TelegramChannel from the given config.
-func NewTelegramChannelClient(c config) *TelegramChannelClient {
-	return &TelegramChannelClient{config: c}
+// NewTaskClient returns a client for the Task from the given config.
+func NewTaskClient(c config) *TaskClient {
+	return &TaskClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `telegramchannel.Hooks(f(g(h())))`.
-func (c *TelegramChannelClient) Use(hooks ...Hook) {
-	c.hooks.TelegramChannel = append(c.hooks.TelegramChannel, hooks...)
+// A call to `Use(f, g, h)` equals to `task.Hooks(f(g(h())))`.
+func (c *TaskClient) Use(hooks ...Hook) {
+	c.hooks.Task = append(c.hooks.Task, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `telegramchannel.Intercept(f(g(h())))`.
-func (c *TelegramChannelClient) Intercept(interceptors ...Interceptor) {
-	c.inters.TelegramChannel = append(c.inters.TelegramChannel, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `task.Intercept(f(g(h())))`.
+func (c *TaskClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Task = append(c.inters.Task, interceptors...)
 }
 
-// Create returns a builder for creating a TelegramChannel entity.
-func (c *TelegramChannelClient) Create() *TelegramChannelCreate {
-	mutation := newTelegramChannelMutation(c.config, OpCreate)
-	return &TelegramChannelCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Task entity.
+func (c *TaskClient) Create() *TaskCreate {
+	mutation := newTaskMutation(c.config, OpCreate)
+	return &TaskCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of TelegramChannel entities.
-func (c *TelegramChannelClient) CreateBulk(builders ...*TelegramChannelCreate) *TelegramChannelCreateBulk {
-	return &TelegramChannelCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Task entities.
+func (c *TaskClient) CreateBulk(builders ...*TaskCreate) *TaskCreateBulk {
+	return &TaskCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *TelegramChannelClient) MapCreateBulk(slice any, setFunc func(*TelegramChannelCreate, int)) *TelegramChannelCreateBulk {
+func (c *TaskClient) MapCreateBulk(slice any, setFunc func(*TaskCreate, int)) *TaskCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &TelegramChannelCreateBulk{err: fmt.Errorf("calling to TelegramChannelClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &TaskCreateBulk{err: fmt.Errorf("calling to TaskClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*TelegramChannelCreate, rv.Len())
+	builders := make([]*TaskCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &TelegramChannelCreateBulk{config: c.config, builders: builders}
+	return &TaskCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for TelegramChannel.
-func (c *TelegramChannelClient) Update() *TelegramChannelUpdate {
-	mutation := newTelegramChannelMutation(c.config, OpUpdate)
-	return &TelegramChannelUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Task.
+func (c *TaskClient) Update() *TaskUpdate {
+	mutation := newTaskMutation(c.config, OpUpdate)
+	return &TaskUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *TelegramChannelClient) UpdateOne(_m *TelegramChannel) *TelegramChannelUpdateOne {
-	mutation := newTelegramChannelMutation(c.config, OpUpdateOne, withTelegramChannel(_m))
-	return &TelegramChannelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *TaskClient) UpdateOne(_m *Task) *TaskUpdateOne {
+	mutation := newTaskMutation(c.config, OpUpdateOne, withTask(_m))
+	return &TaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TelegramChannelClient) UpdateOneID(id int64) *TelegramChannelUpdateOne {
-	mutation := newTelegramChannelMutation(c.config, OpUpdateOne, withTelegramChannelID(id))
-	return &TelegramChannelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *TaskClient) UpdateOneID(id int) *TaskUpdateOne {
+	mutation := newTaskMutation(c.config, OpUpdateOne, withTaskID(id))
+	return &TaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for TelegramChannel.
-func (c *TelegramChannelClient) Delete() *TelegramChannelDelete {
-	mutation := newTelegramChannelMutation(c.config, OpDelete)
-	return &TelegramChannelDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Task.
+func (c *TaskClient) Delete() *TaskDelete {
+	mutation := newTaskMutation(c.config, OpDelete)
+	return &TaskDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *TelegramChannelClient) DeleteOne(_m *TelegramChannel) *TelegramChannelDeleteOne {
+func (c *TaskClient) DeleteOne(_m *Task) *TaskDeleteOne {
 	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TelegramChannelClient) DeleteOneID(id int64) *TelegramChannelDeleteOne {
-	builder := c.Delete().Where(telegramchannel.ID(id))
+func (c *TaskClient) DeleteOneID(id int) *TaskDeleteOne {
+	builder := c.Delete().Where(task.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &TelegramChannelDeleteOne{builder}
+	return &TaskDeleteOne{builder}
 }
 
-// Query returns a query builder for TelegramChannel.
-func (c *TelegramChannelClient) Query() *TelegramChannelQuery {
-	return &TelegramChannelQuery{
+// Query returns a query builder for Task.
+func (c *TaskClient) Query() *TaskQuery {
+	return &TaskQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeTelegramChannel},
+		ctx:    &QueryContext{Type: TypeTask},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a TelegramChannel entity by its id.
-func (c *TelegramChannelClient) Get(ctx context.Context, id int64) (*TelegramChannel, error) {
-	return c.Query().Where(telegramchannel.ID(id)).Only(ctx)
+// Get returns a Task entity by its id.
+func (c *TaskClient) Get(ctx context.Context, id int) (*Task, error) {
+	return c.Query().Where(task.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TelegramChannelClient) GetX(ctx context.Context, id int64) *TelegramChannel {
+func (c *TaskClient) GetX(ctx context.Context, id int) *Task {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -315,169 +305,36 @@ func (c *TelegramChannelClient) GetX(ctx context.Context, id int64) *TelegramCha
 }
 
 // Hooks returns the client hooks.
-func (c *TelegramChannelClient) Hooks() []Hook {
-	return c.hooks.TelegramChannel
+func (c *TaskClient) Hooks() []Hook {
+	return c.hooks.Task
 }
 
 // Interceptors returns the client interceptors.
-func (c *TelegramChannelClient) Interceptors() []Interceptor {
-	return c.inters.TelegramChannel
+func (c *TaskClient) Interceptors() []Interceptor {
+	return c.inters.Task
 }
 
-func (c *TelegramChannelClient) mutate(ctx context.Context, m *TelegramChannelMutation) (Value, error) {
+func (c *TaskClient) mutate(ctx context.Context, m *TaskMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&TelegramChannelCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&TaskCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&TelegramChannelUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&TaskUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&TelegramChannelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&TaskUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&TelegramChannelDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&TaskDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown TelegramChannel mutation op: %q", m.Op())
-	}
-}
-
-// TelegramSessionClient is a client for the TelegramSession schema.
-type TelegramSessionClient struct {
-	config
-}
-
-// NewTelegramSessionClient returns a client for the TelegramSession from the given config.
-func NewTelegramSessionClient(c config) *TelegramSessionClient {
-	return &TelegramSessionClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `telegramsession.Hooks(f(g(h())))`.
-func (c *TelegramSessionClient) Use(hooks ...Hook) {
-	c.hooks.TelegramSession = append(c.hooks.TelegramSession, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `telegramsession.Intercept(f(g(h())))`.
-func (c *TelegramSessionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.TelegramSession = append(c.inters.TelegramSession, interceptors...)
-}
-
-// Create returns a builder for creating a TelegramSession entity.
-func (c *TelegramSessionClient) Create() *TelegramSessionCreate {
-	mutation := newTelegramSessionMutation(c.config, OpCreate)
-	return &TelegramSessionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of TelegramSession entities.
-func (c *TelegramSessionClient) CreateBulk(builders ...*TelegramSessionCreate) *TelegramSessionCreateBulk {
-	return &TelegramSessionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *TelegramSessionClient) MapCreateBulk(slice any, setFunc func(*TelegramSessionCreate, int)) *TelegramSessionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &TelegramSessionCreateBulk{err: fmt.Errorf("calling to TelegramSessionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*TelegramSessionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &TelegramSessionCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for TelegramSession.
-func (c *TelegramSessionClient) Update() *TelegramSessionUpdate {
-	mutation := newTelegramSessionMutation(c.config, OpUpdate)
-	return &TelegramSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *TelegramSessionClient) UpdateOne(_m *TelegramSession) *TelegramSessionUpdateOne {
-	mutation := newTelegramSessionMutation(c.config, OpUpdateOne, withTelegramSession(_m))
-	return &TelegramSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *TelegramSessionClient) UpdateOneID(id int) *TelegramSessionUpdateOne {
-	mutation := newTelegramSessionMutation(c.config, OpUpdateOne, withTelegramSessionID(id))
-	return &TelegramSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for TelegramSession.
-func (c *TelegramSessionClient) Delete() *TelegramSessionDelete {
-	mutation := newTelegramSessionMutation(c.config, OpDelete)
-	return &TelegramSessionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *TelegramSessionClient) DeleteOne(_m *TelegramSession) *TelegramSessionDeleteOne {
-	return c.DeleteOneID(_m.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TelegramSessionClient) DeleteOneID(id int) *TelegramSessionDeleteOne {
-	builder := c.Delete().Where(telegramsession.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &TelegramSessionDeleteOne{builder}
-}
-
-// Query returns a query builder for TelegramSession.
-func (c *TelegramSessionClient) Query() *TelegramSessionQuery {
-	return &TelegramSessionQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeTelegramSession},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a TelegramSession entity by its id.
-func (c *TelegramSessionClient) Get(ctx context.Context, id int) (*TelegramSession, error) {
-	return c.Query().Where(telegramsession.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *TelegramSessionClient) GetX(ctx context.Context, id int) *TelegramSession {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *TelegramSessionClient) Hooks() []Hook {
-	return c.hooks.TelegramSession
-}
-
-// Interceptors returns the client interceptors.
-func (c *TelegramSessionClient) Interceptors() []Interceptor {
-	return c.inters.TelegramSession
-}
-
-func (c *TelegramSessionClient) mutate(ctx context.Context, m *TelegramSessionMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&TelegramSessionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&TelegramSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&TelegramSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&TelegramSessionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown TelegramSession mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Task mutation op: %q", m.Op())
 	}
 }
 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		TelegramChannel, TelegramSession []ent.Hook
+		Task []ent.Hook
 	}
 	inters struct {
-		TelegramChannel, TelegramSession []ent.Interceptor
+		Task []ent.Interceptor
 	}
 )

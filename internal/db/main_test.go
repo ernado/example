@@ -64,6 +64,10 @@ func (suite *DBTestSuite) SetupSuite() {
 	client, pool, err := openClient(ctx, uri)
 	suite.Require().NoError(err)
 
+	// Create initial schema.
+	err = client.Schema.Create(ctx)
+	suite.Require().NoError(err)
+
 	//nolint:nosprintfhostport
 	conn, err := pgx.Connect(ctx, fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable",
 		dbUser, dbPassword, ip, "postgres",
@@ -75,6 +79,12 @@ func (suite *DBTestSuite) SetupSuite() {
 	suite.db = New(suite.ent)
 	suite.uri = uri
 	suite.pool = pool
+}
+
+func (suite *DBTestSuite) SetupTest() {
+	ctx := suite.T().Context()
+	err := suite.ent.Schema.Create(ctx)
+	suite.Require().NoError(err)
 }
 
 func (suite *DBTestSuite) TearDownTest() {
@@ -94,16 +104,12 @@ func (suite *DBTestSuite) TearDownTest() {
 	_, err = suite.pgx.Exec(ctx, "CREATE DATABASE test_db WITH OWNER test_user")
 	suite.Require().NoError(err)
 
-	// Migrate.
 	client, pool, err := openClient(ctx, suite.uri)
 	suite.Require().NoError(err)
 
 	suite.ent = client
 	suite.pool = pool
 	suite.db = New(suite.ent)
-
-	err = suite.ent.Schema.Create(ctx)
-	suite.Require().NoError(err)
 }
 
 func TestDBTestSuite(t *testing.T) {
