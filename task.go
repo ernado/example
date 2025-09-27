@@ -12,6 +12,8 @@ type Task struct {
 }
 
 // DB represents a database for tasks.
+//
+//go:generate go tool moq -fmt goimports -out ./internal/mock/db.go -pkg mock . DB
 type DB interface {
 	CreateTask(ctx context.Context, title string) (*Task, error)
 	ListTasks(ctx context.Context) ([]*Task, error)

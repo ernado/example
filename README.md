@@ -11,6 +11,7 @@ Example project with best practices.
 | Database        | [PostgreSQL](http://postgresql.org/) 18           | Reliable relational database                   |
 | OpenAPI codegen | [ogen](https://ogen.dev/)                         | OpenAPI v3 code generator for Go               |
 | OpenAPI linter  | [vacuum](https://quobix.com/vacuum/)              | OpenAPI v3 linter                              |
+| Mocks           | [moq](https://github.com/matryer/moq)             | Generate mocks for Go interfaces               |
 
 ## Installation
 
