@@ -110,6 +110,12 @@ linters:
       - linters:
           - revive
         text: comment on exported const .+ should be of the form
+      - linters:
+          - gocritic
+        text: "importShadow: shadow of imported from 'github.com/stretchr/testify/suite' package 'suite'"
+      - linters:
+          - gocritic
+        text: "importShadow: shadow of imported from 'github.com/ernado/example/internal/ent' package 'ent'"
     paths:
       - third_party$
       - builtin$
