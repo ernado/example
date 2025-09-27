@@ -78,3 +78,12 @@ Note `entc.go` and `generate.go` files.
 #### schema
 
 Ent schemas.
+
+## cmd
+
+Main application entrypoints.
+All commands MUST be here.
+
+### SDK
+
+Applications SHOULD use [go-faster/sdk](https://github.com/go-faster/sdk).
