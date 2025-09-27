@@ -9,6 +9,7 @@ permissions:
   contents: write
   packages: write
   id-token: write # needed for signing the images with GitHub OIDC Token **not production ready**
+  attestations: write # needed for attestation of the build provenance
 
 env:
   REGISTRY: ghcr.io
