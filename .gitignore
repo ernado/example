@@ -15,5 +15,5 @@
 # vendor/
 
 .task
-./example
+/example
 dist/
