@@ -31,6 +31,15 @@ func (UnimplementedHandler) DeleteTask(ctx context.Context, params DeleteTaskPar
 	return r, ht.ErrNotImplemented
 }
 
+// GenerateError implements generateError operation.
+//
+// Utility endpoint for testing error handling - always returns an error response.
+//
+// POST /tasks/error
+func (UnimplementedHandler) GenerateError(ctx context.Context) (r *Error, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetHealth implements getHealth operation.
 //
 // Get health.

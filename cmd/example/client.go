@@ -52,6 +52,23 @@ func Client() *cobra.Command {
 						}
 					}
 				})
+				g.Go(func() error {
+					ticker := time.NewTicker(2 * time.Second)
+					defer ticker.Stop()
+
+					for {
+						select {
+						case <-ctx.Done():
+							return ctx.Err()
+						case <-ticker.C:
+							if _, err := client.GenerateError(ctx); err != nil {
+								lg.Info("Expected error", zap.Error(err))
+							} else {
+								lg.Error("Expected error, got nil")
+							}
+						}
+					}
+				})
 
 				return g.Wait()
 			})

@@ -26,6 +26,18 @@ type Handler struct {
 	tasksReturned metric.Int64Counter
 }
 
+func (h *Handler) GenerateError(ctx context.Context) (*oas.Error, error) {
+	ctx, span := h.tracer.Start(ctx, "GenerateError")
+	defer span.End()
+
+	err := h.db.GenerateError(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "generate error")
+	}
+
+	return nil, errors.New("unreachable")
+}
+
 func (h *Handler) CreateTask(ctx context.Context, req *oas.CreateTaskRequest) (*oas.Task, error) {
 	ctx, span := h.tracer.Start(ctx, "CreateTask")
 	defer span.End()

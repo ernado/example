@@ -93,6 +93,23 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /tasks/error:
+    post:
+      operationId: "generateError"
+      summary: "Generate an error"
+      description: "Utility endpoint for testing error handling - always returns an error response"
+      tags: [tasks]
+      responses:
+        '200':
+          description: "Should be not used, just a stub"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        # Always should return error response.
+        default:
+          $ref: "#/components/responses/Error"
+
 components:
   schemas:
     # Error-related schemas.

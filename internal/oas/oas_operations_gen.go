@@ -6,8 +6,9 @@ package oas
 type OperationName = string
 
 const (
-	CreateTaskOperation OperationName = "CreateTask"
-	DeleteTaskOperation OperationName = "DeleteTask"
-	GetHealthOperation  OperationName = "GetHealth"
-	ListTasksOperation  OperationName = "ListTasks"
+	CreateTaskOperation    OperationName = "CreateTask"
+	DeleteTaskOperation    OperationName = "DeleteTask"
+	GenerateErrorOperation OperationName = "GenerateError"
+	GetHealthOperation     OperationName = "GetHealth"
+	ListTasksOperation     OperationName = "ListTasks"
 )

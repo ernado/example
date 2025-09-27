@@ -39,6 +39,12 @@ type Invoker interface {
 	//
 	// DELETE /tasks/{id}
 	DeleteTask(ctx context.Context, params DeleteTaskParams) (DeleteTaskRes, error)
+	// GenerateError invokes generateError operation.
+	//
+	// Utility endpoint for testing error handling - always returns an error response.
+	//
+	// POST /tasks/error
+	GenerateError(ctx context.Context) (*Error, error)
 	// GetHealth invokes getHealth operation.
 	//
 	// Get health.
@@ -260,6 +266,79 @@ func (c *Client) sendDeleteTask(ctx context.Context, params DeleteTaskParams) (r
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteTaskResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GenerateError invokes generateError operation.
+//
+// Utility endpoint for testing error handling - always returns an error response.
+//
+// POST /tasks/error
+func (c *Client) GenerateError(ctx context.Context) (*Error, error) {
+	res, err := c.sendGenerateError(ctx)
+	return res, err
+}
+
+func (c *Client) sendGenerateError(ctx context.Context) (res *Error, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("generateError"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/tasks/error"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, GenerateErrorOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/tasks/error"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeGenerateErrorResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

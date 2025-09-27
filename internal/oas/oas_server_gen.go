@@ -20,6 +20,12 @@ type Handler interface {
 	//
 	// DELETE /tasks/{id}
 	DeleteTask(ctx context.Context, params DeleteTaskParams) (DeleteTaskRes, error)
+	// GenerateError implements generateError operation.
+	//
+	// Utility endpoint for testing error handling - always returns an error response.
+	//
+	// POST /tasks/error
+	GenerateError(ctx context.Context) (*Error, error)
 	// GetHealth implements getHealth operation.
 	//
 	// Get health.
