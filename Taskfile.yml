@@ -1,0 +1,101 @@
+# https://taskfile.dev
+version: '3'
+
+env:
+  GO111MODULE: on
+  GOPROXY: https://proxy.golang.org,direct
+  IMAGE: '{{default "registry.localhost/go-faster/example" .IMAGE}}'
+
+vars:
+  DOCKER: '{{default "docker" .DOCKER}}'
+
+tasks:
+  setup:
+    desc: Install dependencies
+    cmds:
+      - go mod tidy
+
+  build:
+    desc: Build the binary
+    sources:
+      - ./**/*.go
+    generates:
+      - ./example
+    cmds:
+      - go build -o ./example ./cmd/example
+
+  test:
+    desc: Run tests
+    env:
+      LC_ALL: C
+      CGO_ENABLED: 1
+    vars:
+      TEST_OPTIONS: '{{default "" .TEST_OPTIONS}}'
+      SOURCE_FILES: '{{default "./..." .SOURCE_FILES}}'
+      TEST_PATTERN: '{{default "." .TEST_PATTERN}}'
+    cmds:
+      - go test {{.TEST_OPTIONS}} -failfast -race -coverpkg=./... -covermode=atomic -coverprofile=coverage.txt {{.SOURCE_FILES}} -run {{.TEST_PATTERN}} -timeout=5m
+
+  cover:
+    desc: Open the cover tool
+    cmds:
+      - go tool cover -html=coverage.txt
+
+  fmt:
+    desc: gofumpt all code
+    cmds:
+      - gofumpt -w -l .
+
+  lint:
+    desc: Lint the code with golangci-lint
+    cmds:
+      - golangci-lint run ./...
+
+  ci:
+    desc: Run all CI steps
+    cmds:
+      - task: setup
+      - task: build
+      - task: test
+
+  default:
+    desc: Runs the default tasks
+    cmds:
+      - task: ci
+
+  release:
+    desc: Create a new tag
+    vars:
+      NEXT:
+        sh: svu n
+    cmds:
+      - git tag {{.NEXT}}
+      - echo {{.NEXT}}
+      - git push origin --tags
+
+  goreleaser:test:
+    desc: Test built linux packages
+    cmds:
+      - task: goreleaser:test:apk
+      - task: goreleaser:test:deb
+      - task: goreleaser:test:rpm
+
+  goreleaser:
+    desc: Run GoReleaser either in snapshot or release mode
+    deps:
+      - build
+    env:
+      IMAGE: '{{default "localhost/example" .IMAGE}}'
+    vars:
+      SNAPSHOT:
+        sh: 'if [[ $GITHUB_REF != refs/tags/v* ]]; then echo "--snapshot"; fi'
+    cmds:
+      - goreleaser release --clean --timeout 60m {{.SNAPSHOT}}
+
+  gather-pgo:
+    desc: Gather PGO profiles
+    cmds:
+      - rm -f ./cmd/example/*.pgo
+      - profilecli query merge --query='{service_name="example.server"}' --profile-type="process_cpu:cpu:nanoseconds:cpu:nanoseconds" --from="now-5m" --to="now" --output=pprof=./cmd/example/server.pgo
+      - profilecli query merge --query='{service_name="example.client"}' --profile-type="process_cpu:cpu:nanoseconds:cpu:nanoseconds" --from="now-5m" --to="now" --output=pprof=./cmd/example/client.pgo
+      - go tool pprof -proto ./cmd/example/server.pgo ./cmd/example/client.pgo > ./cmd/example/default.pgo
