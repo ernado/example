@@ -19,6 +19,7 @@ env:
 jobs:
   run:
     runs-on: ubuntu-latest
+    environment: release
     steps:
       # https://goreleaser.com/ci/actions/
       - uses: actions/checkout@v5
