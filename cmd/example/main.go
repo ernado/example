@@ -47,16 +47,19 @@ func main() {
 		})
 		g.Go(func() error {
 			// NB: Using ShutdownContext is important to properly execute graceful shutdown.
-			ctx := t.ShutdownContext()
+			shutdownContext := t.ShutdownContext()
 			select {
 			case <-gCtx.Done():
 				// Non-graceful shutdown.
 				lg.Warn("Context done before shutdown")
-				return gCtx.Err()
-			case <-ctx.Done():
+			case <-shutdownContext.Done():
 				lg.Info("Shutting down server")
 			}
-			return svc.Shutdown(ctx)
+			// NB: Explicitly using t.BaseContext() to ensure that server
+			// is properly shut down before application exits.
+			//
+			// This context is canceled when shutdown is completed.
+			return svc.Shutdown(t.BaseContext())
 		})
 
 		return g.Wait()
