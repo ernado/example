@@ -42,6 +42,7 @@ curl -sSf https://atlasgo.sh | sh
 | `go.test.sh`         | Script to run tests                                                                  |
 | `migrate.Dockerfile` | Docker file for ent migrations                                                       |
 | `AGENTS.md`          | Rules for LLMs. Linked to [copilot-instructions.md](.github/copilot-instructions.md) |
+| .atlas.hcl           | Atlas configuration for ent migrations                                               |
 
 ### .github
 
@@ -83,6 +84,31 @@ Most code SHOULD be here.
 Ent ORM code.
 
 Note `entc.go` and `generate.go` files.
+
+#### atlas.hcl
+
+We are using docker engine for atlas:
+
+```hcl
+data "external_schema" "ent" {
+  program = [
+    "go", "tool", "ent", "schema",
+    "./internal/ent/schema",
+    "--dialect", "postgres",
+  ]
+}
+
+env "dev" {
+  dev = "docker://postgres/18/test?search_path=public"
+  src  = data.external_schema.ent.url
+}
+```
+
+To add migration named `some-migration-name`:
+
+```console
+atlas migrate --env dev diff some-migration-name
+```
 
 #### schema
 
