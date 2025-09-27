@@ -21,7 +21,7 @@ curl -sSf https://atlasgo.sh | sh
 
 ## Commits
 
-We are using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) MUST be used.
 
 ## Structure
 
@@ -91,7 +91,7 @@ Note `entc.go` and `generate.go` files.
 
 #### atlas.hcl
 
-We are using docker engine for atlas:
+Docker engine for atlas is configured as follows:
 
 ```hcl
 data "external_schema" "ent" {
