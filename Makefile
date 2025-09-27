@@ -6,7 +6,7 @@ coverage:
 	@./go.coverage.sh
 .PHONY: coverage
 
-test_fast:
+test-fast:
 	go test ./...
 
 tidy:
@@ -17,3 +17,6 @@ migrate:
 
 generate:
 	go generate ./...
+
+lint-openapi:
+	go tool vacuum lint -d _oas/openapi.yaml

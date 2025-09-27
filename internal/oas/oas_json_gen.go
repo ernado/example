@@ -22,27 +22,27 @@ func (s *Error) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *Error) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("error_message")
+		e.FieldStart("errorMessage")
 		e.Str(s.ErrorMessage)
 	}
 	{
 		if s.TraceID.Set {
-			e.FieldStart("trace_id")
+			e.FieldStart("traceID")
 			s.TraceID.Encode(e)
 		}
 	}
 	{
 		if s.SpanID.Set {
-			e.FieldStart("span_id")
+			e.FieldStart("spanID")
 			s.SpanID.Encode(e)
 		}
 	}
 }
 
 var jsonFieldsNameOfError = [3]string{
-	0: "error_message",
-	1: "trace_id",
-	2: "span_id",
+	0: "errorMessage",
+	1: "traceID",
+	2: "spanID",
 }
 
 // Decode decodes Error from json.
@@ -54,7 +54,7 @@ func (s *Error) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "error_message":
+		case "errorMessage":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
@@ -64,9 +64,9 @@ func (s *Error) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error_message\"")
+				return errors.Wrap(err, "decode field \"errorMessage\"")
 			}
-		case "trace_id":
+		case "traceID":
 			if err := func() error {
 				s.TraceID.Reset()
 				if err := s.TraceID.Decode(d); err != nil {
@@ -74,9 +74,9 @@ func (s *Error) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"trace_id\"")
+				return errors.Wrap(err, "decode field \"traceID\"")
 			}
-		case "span_id":
+		case "spanID":
 			if err := func() error {
 				s.SpanID.Reset()
 				if err := s.SpanID.Decode(d); err != nil {
@@ -84,7 +84,7 @@ func (s *Error) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"span_id\"")
+				return errors.Wrap(err, "decode field \"spanID\"")
 			}
 		default:
 			return d.Skip()
@@ -164,7 +164,7 @@ func (s *Health) encodeFields(e *jx.Encoder) {
 		e.Str(s.Commit)
 	}
 	{
-		e.FieldStart("build_date")
+		e.FieldStart("buildDate")
 		json.EncodeDateTime(e, s.BuildDate)
 	}
 }
@@ -173,7 +173,7 @@ var jsonFieldsNameOfHealth = [4]string{
 	0: "status",
 	1: "version",
 	2: "commit",
-	3: "build_date",
+	3: "buildDate",
 }
 
 // Decode decodes Health from json.
@@ -221,7 +221,7 @@ func (s *Health) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"commit\"")
 			}
-		case "build_date":
+		case "buildDate":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
@@ -231,7 +231,7 @@ func (s *Health) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"build_date\"")
+				return errors.Wrap(err, "decode field \"buildDate\"")
 			}
 		default:
 			return d.Skip()

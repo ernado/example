@@ -5,13 +5,17 @@ info:
   version: 1.0.0
 servers:
   - url: 'http://vega.localhost'
+tags:
+  - name: observability
+    description: Observability endpoints
 paths:
   /health:
     get:
       operationId: "getHealth"
       description: "get health"
+      tags: [observability]
       responses:
-        200:
+        '200':
           description: Health
           content:
             "application/json":
@@ -29,7 +33,7 @@ components:
       example: 0af7651916cd43dd8448eb211c80319c
       externalDocs:
         url: "https://www.w3.org/TR/trace-context/#trace-id"
-        description: "W3C Trace Context specification"
+        description: "W3C Trace Context specification: Trace ID"
     SpanID:
       type: string
       description: W3C parent-id (span)
@@ -37,7 +41,7 @@ components:
       example: b7ad6b7169203331
       externalDocs:
         url: "https://www.w3.org/TR/trace-context/#parent-id"
-        description: "W3C Trace Context specification"
+        description: "W3C Trace Context specification: Parent ID"
     Error:
       title: Structured error
       description: Error occurred while processing request
@@ -46,30 +50,30 @@ components:
         description: "Structured error specification"
       type: object
       required:
-        - error_message
-        - body
+        - errorMessage
       properties:
-        error_message:
+        errorMessage:
           type: string
           description: "Human-readable error message"
           example: "Something went wrong"
-        trace_id:
+        traceID:
           $ref: "#/components/schemas/TraceID"
-        span_id:
+        spanID:
           $ref: "#/components/schemas/SpanID"
 
     # Health-related schemas.
     Health:
       type: object
+      description: Health status
       required:
         - status
         - version
         - commit
-        - build_date
+        - buildDate
       properties:
         status:
           type: string
-          description: "Health status"
+          description: "Health status string"
           example: "ok"
         version:
           type: string
@@ -79,7 +83,7 @@ components:
           type: string
           description: "Service commit"
           example: "c1b2d3f4"
-        build_date:
+        buildDate:
           type: string
           description: "Service build date"
           example: "2022-01-01T00:00:00Z"

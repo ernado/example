@@ -27,7 +27,7 @@ func (s *Error) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "trace_id",
+			Name:  "traceID",
 			Error: err,
 		})
 	}
@@ -45,7 +45,7 @@ func (s *Error) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "span_id",
+			Name:  "spanID",
 			Error: err,
 		})
 	}

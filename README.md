@@ -10,6 +10,7 @@ Example project with best practices.
 | Migrations      | [atlas](https://atlasgo.io/)                      | Database schema migrations and management      |
 | Database        | [PostgreSQL](http://postgresql.org/) 18           | Reliable relational database                   |
 | OpenAPI codegen | [ogen](https://ogen.dev/)                         | OpenAPI v3 code generator for Go               |
+| OpenAPI linter  | [vacuum](https://quobix.com/vacuum/)              | OpenAPI v3 linter                              |
 
 ## Installation
 

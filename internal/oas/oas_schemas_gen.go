@@ -15,9 +15,9 @@ func (s *ErrorStatusCode) Error() string {
 // Ref: #/components/schemas/Error
 type Error struct {
 	// Human-readable error message.
-	ErrorMessage string     `json:"error_message"`
-	TraceID      OptTraceID `json:"trace_id"`
-	SpanID       OptSpanID  `json:"span_id"`
+	ErrorMessage string     `json:"errorMessage"`
+	TraceID      OptTraceID `json:"traceID"`
+	SpanID       OptSpanID  `json:"spanID"`
 }
 
 // GetErrorMessage returns the value of ErrorMessage.
@@ -76,16 +76,17 @@ func (s *ErrorStatusCode) SetResponse(val Error) {
 	s.Response = val
 }
 
+// Health status.
 // Ref: #/components/schemas/Health
 type Health struct {
-	// Health status.
+	// Health status string.
 	Status string `json:"status"`
 	// Service version.
 	Version string `json:"version"`
 	// Service commit.
 	Commit string `json:"commit"`
 	// Service build date.
-	BuildDate time.Time `json:"build_date"`
+	BuildDate time.Time `json:"buildDate"`
 }
 
 // GetStatus returns the value of Status.
