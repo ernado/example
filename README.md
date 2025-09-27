@@ -127,3 +127,66 @@ All commands MUST be here.
 ### SDK
 
 Applications SHOULD use [go-faster/sdk](https://github.com/go-faster/sdk).
+
+## Approaches for structuring application
+
+### MVC-like
+
+Divide application into models, views (handlers), controllers (services).
+
+```mermaid
+graph TB
+    Client[Client/Browser] --> Handler[Handlers - Views]
+    Handler --> Service[Services - Controllers]
+    Service --> Model[Models]
+    Model --> DB[(Database)]
+    Model --> Ent[Ent Client]
+
+    subgraph "Application Layers"
+        Handler
+        Service
+        Model
+    end
+
+    subgraph "External Dependencies"
+        DB
+        Ent
+    end
+
+    Handler -.-> OAS[OAS Generated Code]
+    Service -.-> BusinessLogic[Business Logic]
+    Model -.-> Entities[Database Entities]
+
+    classDef handler fill:#e1f5fe
+    classDef service fill:#f3e5f5
+    classDef model fill:#e8f5e8
+    classDef external fill:#fff3e0
+
+    class Handler handler
+    class Service service
+    class Model model
+    class DB,Ent external
+```
+
+Handlers are implementation of oas handlers. Call services.
+
+Model abstracts database entities, i.e. ent client interactions.
+Also model defines entities.
+
+Service implements business logic, i.e. calls models and other services.
+
+Pros
+- Clear separation of concerns
+
+Cons:
+- More boilerplate code
+
+### In-place
+
+Just handlers with business logic and ent client usage.
+
+Pros:
+- Less boilerplate code
+
+Cons:
+- Harder to test
