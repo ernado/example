@@ -11,6 +11,28 @@ func (s *ErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
+// Request payload for creating a new task.
+// Ref: #/components/schemas/CreateTaskRequest
+type CreateTaskRequest struct {
+	// Title or description of the task to create.
+	Title string `json:"title"`
+}
+
+// GetTitle returns the value of Title.
+func (s *CreateTaskRequest) GetTitle() string {
+	return s.Title
+}
+
+// SetTitle sets the value of Title.
+func (s *CreateTaskRequest) SetTitle(val string) {
+	s.Title = val
+}
+
+// DeleteTaskNoContent is response for DeleteTask operation.
+type DeleteTaskNoContent struct{}
+
+func (*DeleteTaskNoContent) deleteTaskRes() {}
+
 // Error occurred while processing request.
 // Ref: #/components/schemas/Error
 type Error struct {
@@ -49,6 +71,8 @@ func (s *Error) SetTraceID(val OptTraceID) {
 func (s *Error) SetSpanID(val OptSpanID) {
 	s.SpanID = val
 }
+
+func (*Error) deleteTaskRes() {}
 
 // ErrorStatusCode wraps Error with StatusCode.
 type ErrorStatusCode struct {
@@ -222,5 +246,51 @@ func (o OptTraceID) Or(d TraceID) TraceID {
 }
 
 type SpanID string
+
+// A task entity with unique identifier and title.
+// Ref: #/components/schemas/Task
+type Task struct {
+	// Unique identifier for the task.
+	ID int64 `json:"id"`
+	// Title or description of the task.
+	Title string `json:"title"`
+}
+
+// GetID returns the value of ID.
+func (s *Task) GetID() int64 {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *Task) GetTitle() string {
+	return s.Title
+}
+
+// SetID sets the value of ID.
+func (s *Task) SetID(val int64) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *Task) SetTitle(val string) {
+	s.Title = val
+}
+
+// Response containing a list of tasks.
+// Ref: #/components/schemas/TaskList
+type TaskList struct {
+	// Array of tasks.
+	Tasks []Task `json:"tasks"`
+}
+
+// GetTasks returns the value of Tasks.
+func (s *TaskList) GetTasks() []Task {
+	return s.Tasks
+}
+
+// SetTasks sets the value of Tasks.
+func (s *TaskList) SetTasks(val []Task) {
+	s.Tasks = val
+}
 
 type TraceID string

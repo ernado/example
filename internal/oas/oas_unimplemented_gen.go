@@ -13,12 +13,39 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// CreateTask implements createTask operation.
+//
+// Create a new task with the provided title.
+//
+// POST /tasks
+func (UnimplementedHandler) CreateTask(ctx context.Context, req *CreateTaskRequest) (r *Task, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// DeleteTask implements deleteTask operation.
+//
+// Delete a task by its unique identifier.
+//
+// DELETE /tasks/{id}
+func (UnimplementedHandler) DeleteTask(ctx context.Context, params DeleteTaskParams) (r DeleteTaskRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetHealth implements getHealth operation.
 //
 // Get health.
 //
 // GET /health
 func (UnimplementedHandler) GetHealth(ctx context.Context) (r *Health, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListTasks implements listTasks operation.
+//
+// Retrieve a list of all tasks in the system.
+//
+// GET /tasks
+func (UnimplementedHandler) ListTasks(ctx context.Context) (r *TaskList, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

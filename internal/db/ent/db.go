@@ -5,7 +5,7 @@ import (
 
 	"github.com/ernado/example"
 	"github.com/ernado/example/internal/ent"
-	"github.com/pkg/errors"
+	"github.com/go-faster/errors"
 )
 
 var _ example.DB = (*DB)(nil)
@@ -14,15 +14,19 @@ type DB struct {
 	ent *ent.Client
 }
 
-func (db DB) CreateTask(ctx context.Context, task *example.Task) error {
-	_, err := db.ent.Task.Create().
-		SetTitle(task.Title).
+func (db DB) GenerateError(ctx context.Context) error {
+	return errors.New("generated error")
+}
+
+func (db DB) CreateTask(ctx context.Context, title string) (*example.Task, error) {
+	t, err := db.ent.Task.Create().
+		SetTitle(title).
 		Save(ctx)
 	if err != nil {
-		return errors.Wrap(err, "create task")
+		return nil, errors.Wrap(err, "create task")
 	}
 
-	return nil
+	return taskFromDB(t), nil
 }
 
 func (db DB) ListTasks(ctx context.Context) ([]*example.Task, error) {

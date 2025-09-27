@@ -13,7 +13,6 @@ import (
 	"github.com/ernado/example/internal/ent"
 )
 
-// Open new connection.
 func openClient(ctx context.Context, uri string) (*ent.Client, *pgxpool.Pool, error) {
 	cfg, err := pgxpool.ParseConfig(uri)
 	if err != nil {

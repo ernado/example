@@ -11,6 +11,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestCreateTaskRequest_EncodeDecode(t *testing.T) {
+	var typ CreateTaskRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 CreateTaskRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestError_EncodeDecode(t *testing.T) {
 	var typ Error
 	typ.SetFake()
@@ -45,6 +57,30 @@ func TestSpanID_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 SpanID
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestTask_EncodeDecode(t *testing.T) {
+	var typ Task
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 Task
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestTaskList_EncodeDecode(t *testing.T) {
+	var typ TaskList
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 TaskList
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestTraceID_EncodeDecode(t *testing.T) {

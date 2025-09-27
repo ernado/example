@@ -8,12 +8,30 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// CreateTask implements createTask operation.
+	//
+	// Create a new task with the provided title.
+	//
+	// POST /tasks
+	CreateTask(ctx context.Context, req *CreateTaskRequest) (*Task, error)
+	// DeleteTask implements deleteTask operation.
+	//
+	// Delete a task by its unique identifier.
+	//
+	// DELETE /tasks/{id}
+	DeleteTask(ctx context.Context, params DeleteTaskParams) (DeleteTaskRes, error)
 	// GetHealth implements getHealth operation.
 	//
 	// Get health.
 	//
 	// GET /health
 	GetHealth(ctx context.Context) (*Health, error)
+	// ListTasks implements listTasks operation.
+	//
+	// Retrieve a list of all tasks in the system.
+	//
+	// GET /tasks
+	ListTasks(ctx context.Context) (*TaskList, error)
 	// NewError creates *ErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.

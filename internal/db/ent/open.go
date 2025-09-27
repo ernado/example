@@ -1,4 +1,4 @@
-// Package entdb provide helper for creating pgx dabase for ent.
+// Package entdb provides helper for creating pgx dabase for ent.
 package entdb
 
 import (

@@ -5,15 +5,18 @@ import (
 	"errors"
 )
 
+// Task models a task.
 type Task struct {
 	ID    int64
 	Title string
 }
 
+// DB represents a database for tasks.
 type DB interface {
-	CreateTask(ctx context.Context, task *Task) error
+	CreateTask(ctx context.Context, title string) (*Task, error)
 	ListTasks(ctx context.Context) ([]*Task, error)
 	DeleteTask(ctx context.Context, id int64) error
+	GenerateError(ctx context.Context) error
 }
 
 var ErrTaskNotFound = errors.New("task not found")

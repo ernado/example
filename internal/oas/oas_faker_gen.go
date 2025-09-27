@@ -7,6 +7,15 @@ import (
 )
 
 // SetFake set fake values.
+func (s *CreateTaskRequest) SetFake() {
+	{
+		{
+			s.Title = "string"
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *Error) SetFake() {
 	{
 		{
@@ -74,6 +83,36 @@ func (s *SpanID) SetFake() {
 		unwrapped = "string"
 	}
 	*s = SpanID(unwrapped)
+}
+
+// SetFake set fake values.
+func (s *Task) SetFake() {
+	{
+		{
+			s.ID = int64(0)
+		}
+	}
+	{
+		{
+			s.Title = "string"
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *TaskList) SetFake() {
+	{
+		{
+			s.Tasks = nil
+			for i := 0; i < 0; i++ {
+				var elem Task
+				{
+					elem.SetFake()
+				}
+				s.Tasks = append(s.Tasks, elem)
+			}
+		}
+	}
 }
 
 // SetFake set fake values.

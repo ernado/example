@@ -5,18 +5,121 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/ernado/example"
 	"github.com/ernado/example/internal/oas"
+	"github.com/ernado/example/internal/semconv"
 	"github.com/go-faster/errors"
+	"github.com/go-faster/sdk/zctx"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
 var _ oas.Handler = (*Handler)(nil)
 
 type Handler struct {
+	db     example.DB
+	tracer trace.Tracer
+	meter  metric.Meter
+
+	tasksCreated  metric.Int64Counter
+	tasksDeleted  metric.Int64Counter
+	tasksReturned metric.Int64Counter
 }
 
-func New() *Handler {
-	return &Handler{}
+func (h *Handler) CreateTask(ctx context.Context, req *oas.CreateTaskRequest) (*oas.Task, error) {
+	ctx, span := h.tracer.Start(ctx, "CreateTask")
+	defer span.End()
+
+	lg := zctx.From(ctx)
+	lg.Info("Creating task", semconv.TaskTitle(req.Title))
+
+	task, err := h.db.CreateTask(ctx, req.Title)
+	if err != nil {
+		return nil, errors.Wrap(err, "create task")
+	}
+
+	h.tasksCreated.Add(ctx, 1)
+
+	return convertToOASTask(task), nil
+}
+
+func (h *Handler) DeleteTask(ctx context.Context, params oas.DeleteTaskParams) (oas.DeleteTaskRes, error) {
+	lg := zctx.From(ctx).With(semconv.TaskID(params.ID))
+	lg.Info("Deleting task")
+
+	err := h.db.DeleteTask(ctx, params.ID)
+	if errors.Is(err, example.ErrTaskNotFound) {
+		return nil, &oas.ErrorStatusCode{
+			StatusCode: 200,
+			Response: oas.Error{
+				ErrorMessage: "task not found",
+			},
+		}
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "delete task")
+	}
+
+	lg.Info("Task deleted")
+
+	h.tasksDeleted.Add(ctx, 1)
+
+	return &oas.DeleteTaskNoContent{}, nil
+}
+
+func (h *Handler) ListTasks(ctx context.Context) (*oas.TaskList, error) {
+	tasks, err := h.db.ListTasks(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "list tasks")
+	}
+
+	return &oas.TaskList{
+		Tasks: convertToOASTasks(tasks),
+	}, nil
+}
+
+func New(
+	db example.DB,
+	tracerProvider trace.TracerProvider,
+	meterProvider metric.MeterProvider,
+) (*Handler, error) {
+	tracer := tracerProvider.Tracer(semconv.SystemHandler)
+	meter := meterProvider.Meter(semconv.SystemHandler)
+
+	// TODO: Generate metrics initialization code from semantic conventions.
+	tasksCreated, err := meter.Int64Counter(
+		semconv.MetricTasksCreated,
+		metric.WithDescription("Number of tasks created"),
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "create %s counter", semconv.MetricTasksCreated)
+	}
+	tasksReturned, err := meter.Int64Counter(
+		semconv.MetricTasksReturned,
+		metric.WithDescription("Number of tasks returned"),
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "create %s counter", semconv.MetricTasksReturned)
+	}
+	tasksDeleted, err := meter.Int64Counter(
+		semconv.MetricTasksDeleted,
+		metric.WithDescription("Number of tasks deleted"),
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "create %s counter", semconv.MetricTasksDeleted)
+	}
+
+	h := &Handler{
+		db:     db,
+		tracer: tracer,
+		meter:  meter,
+
+		tasksCreated:  tasksCreated,
+		tasksReturned: tasksReturned,
+		tasksDeleted:  tasksDeleted,
+	}
+
+	return h, nil
 }
 
 func (h *Handler) GetHealth(ctx context.Context) (*oas.Health, error) {

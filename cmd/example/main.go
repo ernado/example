@@ -4,8 +4,11 @@ import (
 	"context"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
+	entdb "github.com/ernado/example/internal/db/ent"
+	instrumentationdb "github.com/ernado/example/internal/db/instrumentation"
 	"github.com/ernado/example/internal/handler"
 	"github.com/ernado/example/internal/oas"
 	"github.com/go-faster/errors"
@@ -16,7 +19,28 @@ import (
 
 func main() {
 	app.Run(func(ctx context.Context, lg *zap.Logger, t *app.Telemetry) error {
-		h := handler.New()
+		// TODO: Refactor into Application.
+		entClient, err := entdb.Open(ctx, os.Getenv("DATABASE_URL"), t)
+		if err != nil {
+			return errors.Wrap(err, "connect to db")
+		}
+		db := entdb.New(entClient)
+		instrumentedDB, err := instrumentationdb.New(
+			db,
+			t.TracerProvider(),
+			t.MeterProvider(),
+		)
+		if err != nil {
+			return errors.Wrap(err, "create db instrumentation layer")
+		}
+		h, err := handler.New(
+			instrumentedDB,
+			t.TracerProvider(),
+			t.MeterProvider(),
+		)
+		if err != nil {
+			return errors.Wrap(err, "create handler")
+		}
 		s, err := oas.NewServer(
 			h,
 			oas.WithMeterProvider(t.MeterProvider()),

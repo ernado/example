@@ -1,13 +1,15 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
-  title: vega api
-  description: vega api
+  title: example api
+  description: example api
   version: 1.0.0
 servers:
-  - url: 'http://vega.localhost'
+  - url: 'http://example.localhost'
 tags:
   - name: observability
     description: Observability endpoints
+  - name: tasks
+    description: Task management endpoints
 paths:
   /health:
     get:
@@ -23,6 +25,74 @@ paths:
                 $ref: "#/components/schemas/Health"
         default:
           $ref:  "#/components/responses/Error"
+
+  # Task management endpoints
+  /tasks:
+    get:
+      operationId: "listTasks"
+      summary: "List all tasks"
+      description: "Retrieve a list of all tasks in the system"
+      tags: [tasks]
+      responses:
+        '200':
+          description: "List of tasks retrieved successfully"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/TaskList"
+        default:
+          $ref: "#/components/responses/Error"
+
+    post:
+      operationId: "createTask"
+      summary: "Create a new task"
+      description: "Create a new task with the provided title"
+      tags: [tasks]
+      requestBody:
+        required: true
+        description: "Task creation request"
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/CreateTaskRequest"
+      responses:
+        '201':
+          description: "Task created successfully"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Task"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /tasks/{id}:
+    delete:
+      operationId: "deleteTask"
+      summary: "Delete a task"
+      description: "Delete a task by its unique identifier"
+      tags: [tasks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Unique identifier of the task to delete"
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            example: 42
+      responses:
+        '204':
+          description: "Task deleted successfully"
+        '404':
+          description: "Task not found"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          $ref: "#/components/responses/Error"
+
 components:
   schemas:
     # Error-related schemas.
@@ -45,9 +115,6 @@ components:
     Error:
       title: Structured error
       description: Error occurred while processing request
-      externalDocs:
-        url: "https://vega.pages.gitlab.corp.mail.ru/docs/dev/spec/v2/errors"
-        description: "Structured error specification"
       type: object
       required:
         - errorMessage
@@ -89,6 +156,60 @@ components:
           example: "2022-01-01T00:00:00Z"
           format: date-time
 
+    # Task-related schemas.
+    Task:
+      type: object
+      title: Task
+      description: "A task entity with unique identifier and title"
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Unique identifier for the task"
+          example: 42
+          minimum: 1
+        title:
+          type: string
+          description: "Title or description of the task"
+          example: "Complete API documentation"
+          minLength: 1
+          maxLength: 255
+
+    TaskList:
+      type: object
+      title: Task List
+      description: "Response containing a list of tasks"
+      required:
+        - tasks
+      properties:
+        tasks:
+          type: array
+          description: "Array of tasks"
+          items:
+            $ref: "#/components/schemas/Task"
+          example:
+            - id: 1
+              title: "Complete API documentation"
+            - id: 2
+              title: "Review pull requests"
+
+    CreateTaskRequest:
+      type: object
+      title: Create Task Request
+      description: "Request payload for creating a new task"
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: "Title or description of the task to create"
+          example: "Complete API documentation"
+          minLength: 1
+          maxLength: 255
+
   responses:
     Error:
       description: Structured error response.
@@ -96,4 +217,3 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
-
