@@ -1,0 +1,87 @@
+volumes:
+  prom:
+
+services:
+  # demo server
+  server:
+    image: ghcr.io/ernado/example
+    command: ["server"]
+    build:
+      context: .
+      dockerfile: build.Dockerfile
+    restart: always
+    environment:
+      - OTEL_LOG_LEVEL=debug
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=go-faster.example.server
+
+  clickhouse:
+    image: "ghcr.io/go-faster/clickhouse-server:23.12"
+    volumes:
+      - ./_hack/clickhouse.xml:/etc/clickhouse-server/config.d/monitoring.xml
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "127.0.0.1:8123/ping"]
+      interval: 1s
+      timeout: 1s
+      retries: 30
+
+  oteldb:
+    image: ghcr.io/go-faster/oteldb
+    environment:
+      - OTELDB_STORAGE=ch
+      - CH_DSN=clickhouse://clickhouse:9000
+      - OTEL_LOG_LEVEL=info
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=go-faster.oteldb
+    depends_on:
+      - clickhouse
+
+  # https://opentelemetry.io/docs/collector/installation/#docker-compose
+  otelcol:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.89.0
+    volumes:
+      - ./_hack/otelcol.yml:/etc/otelcol-contrib/config.yaml
+    depends_on:
+      - oteldb
+    environment:
+      # probably excessive
+      - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otelcol:4317
+    command:
+      - "--config"
+      - "/etc/otelcol-contrib/config.yaml"
+      #  https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/observability.md#how-we-expose-telemetry
+      - "--feature-gates=telemetry.useOtelForInternalMetrics"
+      - "--feature-gates=telemetry.useOtelWithSDKConfigurationForInternalTelemetry"
+
+  grafana:
+    image: "ghcr.io/go-faster/grafana:11.5.0-pre"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor,traceToMetrics,publicDashboards,tempoApmTable
+      - GF_ALERTING_ENABLED=false
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_LOG_LEVEL=debug
+      - GF_INSTALL_PLUGINS=grafana-clickhouse-datasource
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./_hack/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./_hack/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./_hack/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/default.yml
+      - ./_hack/grafana/dashboards:/etc/grafana/dashboards:ro
+    depends_on:
+      - oteldb
+      - otelcol
