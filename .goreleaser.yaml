@@ -142,10 +142,32 @@ docker_signs:
       - '${artifact}@${digest}'
       - --yes
 
+# signs the checksum file
+# all files (including the sboms) are included in the checksum, so we don't need to sign each one if we don't want to
+# https://goreleaser.com/customization/sign
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - '--key'
+      - 'env://COSIGN_PRIVATE_KEY'
+      - "--yes" # needed on cosign 2.0.0+
+    artifacts: checksum
+    output: true
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:
   version_template: "{{ incpatch .Version }}-next"
+
+# create a source tarball
+# https://goreleaser.com/customization/source/
+source:
+  enabled: true
 
 changelog:
   sort: asc
@@ -199,6 +221,8 @@ changelog:
 
 sboms:
   - artifacts: archive
+  - id: source # Two different sbom configurations need two different IDs
+    artifacts: source
 
 nfpms:
   - package_name: example
