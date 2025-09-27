@@ -116,6 +116,9 @@ linters:
       - linters:
           - gocritic
         text: "importShadow: shadow of imported from 'github.com/ernado/example/internal/ent' package 'ent'"
+      - linters:
+          - gocritic
+        text: "ptrToRefParam: consider `err' to be of non-pointer type"
     paths:
       - third_party$
       - builtin$
