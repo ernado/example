@@ -2,7 +2,13 @@ volumes:
   prom:
 
 services:
-  # demo server
+  db:
+    image: postgres:18
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: postgres
+
   server:
     image: ghcr.io/ernado/example
     command: ["server"]
@@ -19,6 +25,25 @@ services:
       - OTEL_EXPORTER_OTLP_INSECURE=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
       - OTEL_RESOURCE_ATTRIBUTES=service.name=go-faster.example.server
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+
+  client:
+    image: ghcr.io/ernado/example
+    command: ["client"]
+    build:
+      context: .
+      dockerfile: build.Dockerfile
+    restart: always
+    environment:
+      - OTEL_LOG_LEVEL=debug
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=go-faster.example.client
+
 
   clickhouse:
     image: "ghcr.io/go-faster/clickhouse-server:23.12"
