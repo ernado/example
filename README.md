@@ -31,6 +31,7 @@ curl -sSf https://atlasgo.sh | sh
 |----------------------|--------------------------------------------------------------------------------------|
 | `.github/`           | GitHub workflows and configurations                                                  |
 | `_oas`               | OpenAPI specifications                                                               |
+| `_otel`              | OpenTelemetry Registry                                                               |
 | `cmd/`               | Main applications                                                                    |
 | `pkg/`               | Directory that **MUST NOT** exist                                                    |
 | `internal/`          | Private application and library code. Most code **SHOULD** be here.                  |

@@ -102,3 +102,14 @@ jobs:
       - name: Lint OpenAPI specs
         run: |
           vacuum lint -d _oas/openapi.yaml
+
+  otel-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install weaver
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/open-telemetry/weaver/releases/download/v0.17.1/weaver-installer.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
