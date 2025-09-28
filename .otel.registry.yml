@@ -1,67 +1,107 @@
 groups:
-    - id: metric.auction.bid.count
-      type: metric
-      brief: Count of all bids we've seen
-      stability: stable
-      attributes:
-        - name: auction.name
-          type: string
-          brief: |
-            The name of the auction
-          examples:
-            - Fish for sale
-          requirement_level: recommended
-          stability: stable
-        - name: auction.id
-          type: int
-          brief: |
-            The id of the auction.
-          requirement_level: required
-          stability: stable
-      metric_name: auction.bid.count
-      instrument: counter
-      unit: '{bid}'
-      lineage:
-        provenance:
-            registry_id: example
-            path: _otel/metrics.yaml
-        attributes:
-            auction.id:
-                source_group: shared.attributes
-                inherited_fields:
-                    - brief
-                    - note
-                    - stability
-                locally_overridden_fields:
-                    - requirement_level
-            auction.name:
-                source_group: shared.attributes
-                inherited_fields:
-                    - brief
-                    - examples
-                    - note
-                    - stability
-                locally_overridden_fields:
-                    - requirement_level
-    - id: shared.attributes
-      type: attribute_group
-      brief: Attributes shared between our signals.
-      attributes:
-        - name: auction.id
-          type: int
-          brief: |
-            The id of the auction.
-          requirement_level: recommended
-          stability: stable
-        - name: auction.name
-          type: string
-          brief: |
-            The name of the auction
-          examples:
-            - Fish for sale
-          requirement_level: recommended
-          stability: stable
-      lineage:
-        provenance:
-            registry_id: example
-            path: _otel/common.yaml
+  - attributes:
+      - brief: |
+          Result of operation.
+        name: db.operation.result
+        requirement_level: recommended
+        stability: stable
+        type:
+          members:
+            - brief: Operation was successful.
+              id: ok
+              stability: stable
+              value: ok
+            - brief: Operation failed.
+              id: error
+              value: error
+            - brief: Operation was cancelled.
+              id: cancelled
+              stability: stable
+              value: cancelled
+    brief: Attributes for database layer.
+    id: db.attributes
+    lineage:
+      provenance:
+        path: _otel/db.yaml
+        registry_id: example
+    type: attribute_group
+  - brief: The number of database operations executed.
+    id: metric.db.operation.count
+    instrument: counter
+    lineage:
+      provenance:
+        path: _otel/metrics.yaml
+        registry_id: example
+    metric_name: db.operation.count
+    stability: stable
+    type: metric
+    unit: '{operation}'
+  - brief: The number of tasks created.
+    id: metric.tasks.created.count
+    instrument: counter
+    lineage:
+      provenance:
+        path: _otel/metrics.yaml
+        registry_id: example
+    metric_name: tasks.created.count
+    stability: stable
+    type: metric
+    unit: '{task}'
+  - brief: The number of tasks deleted.
+    id: metric.tasks.deleted.count
+    instrument: counter
+    lineage:
+      provenance:
+        path: _otel/metrics.yaml
+        registry_id: example
+    metric_name: tasks.deleted.count
+    stability: stable
+    type: metric
+    unit: '{task}'
+  - brief: The number of tasks returned.
+    id: metric.tasks.returned.count
+    instrument: counter
+    lineage:
+      provenance:
+        path: _otel/metrics.yaml
+        registry_id: example
+    metric_name: tasks.returned.count
+    stability: stable
+    type: metric
+    unit: '{task}'
+  - attributes:
+      - brief: |
+          The id of the task
+        name: task.id
+        requirement_level: recommended
+        stability: stable
+        type: int
+      - brief: |
+          The name of the task
+        examples:
+          - Create example repository
+        name: task.title
+        requirement_level: recommended
+        stability: stable
+        type: string
+    brief: Attributes shared between our signals.
+    id: shared.attributes
+    lineage:
+      provenance:
+        path: _otel/common.yaml
+        registry_id: example
+    type: attribute_group
+  - attributes:
+      - brief: |
+          A detailed error message.
+        name: error.detailed
+        requirement_level: recommended
+        stability: development
+        type: string
+    brief: Attributes for errors.
+    id: shared.errors
+    lineage:
+      provenance:
+        path: _otel/common.yaml
+        registry_id: example
+    type: attribute_group

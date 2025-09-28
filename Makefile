@@ -24,14 +24,8 @@ lint-openapi:
 lint-otel-registry:
 	weaver registry check -r _otel
 
-generate-otel-docs:
-	weaver registry generate -t _otel_templates/ -r _otel markdown _docs
-
-generate-otel-go:
-	weaver registry generate -t _otel_templates/ -r _otel go internal/o11y
-
 generate-otel-bundle:
 	weaver registry resolve -r _otel > .otel.registry.yml
-	go run ./internal/cmd/otel-sort/ -f .otel.registry.yml
+	go run ./internal/cmd/otel-sort -f .otel.registry.yml
 
-generate-otel: generate-otel-docs generate-otel-go generate-otel-bundle
+generate-otel: generate-otel-bundle

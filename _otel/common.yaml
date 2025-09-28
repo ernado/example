@@ -3,15 +3,26 @@ groups:
     type: attribute_group
     brief: Attributes shared between our signals.
     attributes:
-      - id: auction.id
+      - id: task.id
         type: int
         brief: >
-          The id of the auction.
+          The id of the task
         stability: stable
-      - id: auction.name
+      - id: task.title
         type: string
         brief: >
-          The name of the auction
+          The name of the task
         stability: stable
-        examples: ["Fish for sale"]
+        examples: ["Create example repository"]
+
+  - id: shared.errors
+    type: attribute_group
+    brief: Attributes for errors.
+    attributes:
+      - id: error.detailed
+        type: string
+        brief: >
+          A detailed error message.
+        stability: experimental
+
 

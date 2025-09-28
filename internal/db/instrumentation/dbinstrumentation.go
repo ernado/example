@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
+	otelsemconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -42,14 +43,16 @@ func (i Instrumentation) instrument(ctx context.Context, operation string, err *
 		}
 		if err != nil && *err != nil {
 			e := *err
-			// TODO: Add to semconv
 			span.AddEvent("error", trace.WithAttributes(
-				attribute.String("error.message", e.Error()),
-				attribute.String("error.type", fmt.Sprintf("%T", e)),
+				otelsemconv.ErrorMessage(e.Error()),
 				attribute.String("error.detailed", fmt.Sprintf("%+v", e)),
 			))
 			span.SetStatus(codes.Error, "Operation failed")
-			attributes = append(attributes, semconv.DBResultError())
+			if errors.Is(e, context.Canceled) {
+				attributes = append(attributes, semconv.DBResultCanceled())
+			} else {
+				attributes = append(attributes, semconv.DBResultError())
+			}
 		} else {
 			span.SetStatus(codes.Ok, "Operation succeeded")
 			attributes = append(attributes, semconv.DBResultOk())

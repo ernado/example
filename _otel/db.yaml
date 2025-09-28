@@ -1,0 +1,23 @@
+groups:
+  - id: db.attributes
+    type: attribute_group
+    brief: Attributes for database layer.
+    attributes:
+      - id: db.operation.result
+        brief: >
+          Result of operation.
+        stability: stable
+        type:
+          members:
+            - id: ok
+              brief: Operation was successful.
+              value: 'ok'
+              stability: stable
+            - id: error
+              brief: Operation failed.
+              value: 'error'
+            - id: cancelled
+              brief: Operation was cancelled.
+              value: 'cancelled'
+              stability: stable
+

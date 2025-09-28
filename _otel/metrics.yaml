@@ -1,14 +1,31 @@
 groups:
-  - id: metric.auction.bid.count
+# Tasks
+  - id: metric.tasks.created.count
     type: metric
-    metric_name: auction.bid.count
+    metric_name: tasks.created.count
     stability: stable
-    brief: "Count of all bids we've seen"
+    brief: The number of tasks created.
     instrument: counter
-    unit: "{bid}"
-    attributes:
-      - ref: auction.id
-        requirement_level: required
-      - ref: auction.name
-        requirement_level: recommended
-
+    unit: "{task}"
+  - id: metric.tasks.deleted.count
+    type: metric
+    metric_name: tasks.deleted.count
+    stability: stable
+    brief: The number of tasks deleted.
+    instrument: counter
+    unit: "{task}"
+  - id: metric.tasks.returned.count
+    type: metric
+    metric_name: tasks.returned.count
+    stability: stable
+    brief: The number of tasks returned.
+    instrument: counter
+    unit: "{task}"
+# Database
+  - id: metric.db.operation.count
+    type: metric
+    metric_name: db.operation.count
+    stability: stable
+    brief: The number of database operations executed.
+    instrument: counter
+    unit: "{operation}"

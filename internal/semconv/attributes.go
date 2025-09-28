@@ -11,7 +11,7 @@ const (
 	AttrTaskTitle = "task.title"
 
 	AttrDBOperation = "db.operation"
-	AttrDBResult    = "db.result"
+	AttrDBResult    = "db.operation.result"
 )
 
 func DBOperation(operation string) attribute.KeyValue {
@@ -30,4 +30,8 @@ func DBResultOk() attribute.KeyValue {
 
 func DBResultError() attribute.KeyValue {
 	return attribute.String(AttrDBResult, DBResultErrorValue)
+}
+
+func DBResultCanceled() attribute.KeyValue {
+	return attribute.String(AttrDBResult, DBResultCanceledValue)
 }
