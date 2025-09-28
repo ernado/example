@@ -1,0 +1,14 @@
+groups:
+  - id: metric.auction.bid.count
+    type: metric
+    metric_name: auction.bid.count
+    stability: stable
+    brief: "Count of all bids we've seen"
+    instrument: counter
+    unit: "{bid}"
+    attributes:
+      - ref: auction.id
+        requirement_level: required
+      - ref: auction.name
+        requirement_level: recommended
+
