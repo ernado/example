@@ -1,3 +1,6 @@
+// Binary otel-sort sorts OpenTelemetry registry bundles by group ID.
+//
+// https://github.com/open-telemetry/weaver/issues/964
 package main
 
 import (
