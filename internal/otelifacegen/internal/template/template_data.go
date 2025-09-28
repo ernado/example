@@ -13,7 +13,7 @@ type Data struct {
 	PkgName         string
 	SrcPkgQualifier string
 	Imports         []*registry.Package
-	Mocks           []MockData
+	Mocks           []InstrumentationData
 	StubImpl        bool
 	SkipEnsure      bool
 	WithResets      bool
@@ -31,10 +31,10 @@ func (d Data) MocksSomeMethod() bool {
 	return false
 }
 
-// MockData is the data used to generate a mock for some interface.
-type MockData struct {
+// InstrumentationData is the data used to generate an instrumentation for some interface.
+type InstrumentationData struct {
 	InterfaceName string
-	MockName      string
+	Name          string
 	TypeParams    []TypeParamData
 	Methods       []MethodData
 }

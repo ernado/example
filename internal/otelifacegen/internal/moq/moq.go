@@ -56,7 +56,7 @@ func (m *Mocker) Mock(w io.Writer, namePairs ...string) error {
 		return errors.New("must specify one interface")
 	}
 
-	mocks := make([]template.MockData, len(namePairs))
+	mocks := make([]template.InstrumentationData, len(namePairs))
 	for i, np := range namePairs {
 		name, mockName := parseInterfaceName(np)
 		iface, tparams, err := m.registry.LookupInterface(name)
@@ -69,9 +69,9 @@ func (m *Mocker) Mock(w io.Writer, namePairs ...string) error {
 			methods[j] = m.methodData(iface.Method(j))
 		}
 
-		mocks[i] = template.MockData{
+		mocks[i] = template.InstrumentationData{
 			InterfaceName: name,
-			MockName:      mockName,
+			Name:          mockName,
 			Methods:       methods,
 			TypeParams:    m.typeParams(tparams),
 		}

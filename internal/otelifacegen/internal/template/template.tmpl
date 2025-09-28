@@ -14,7 +14,7 @@ import (
 {{range $i, $mock := .Mocks -}}
 
 {{- if not $.SkipEnsure -}}
-// Ensure that {{.MockName}} implements {{$.SrcPkgQualifier}}{{.InterfaceName}}.
+// Ensure that {{.Name}} implements {{$.SrcPkgQualifier}}{{.InterfaceName}}.
 var _ {{$.SrcPkgQualifier}}{{.InterfaceName -}}
 	{{- if .TypeParams }}[
 		{{- range $index, $param := .TypeParams}}
@@ -22,11 +22,11 @@ var _ {{$.SrcPkgQualifier}}{{.InterfaceName -}}
 			{{if $param.Constraint}}{{$param.Constraint.String}}{{else}}{{$param.TypeString}}{{end}}
 		{{- end -}}
 		]
-	{{- end }} = (*{{.MockName}})(nil)
+	{{- end }} = (*{{.Name}})(nil)
 {{- end}}
 
-// {{.MockName}} wraps {{$.SrcPkgQualifier}}{{.InterfaceName}} with OpenTelemetry instrumentation.
-type {{.MockName}}
+// {{.Name}} wraps {{$.SrcPkgQualifier}}{{.InterfaceName}} with OpenTelemetry instrumentation.
+type {{.Name}}
 {{- if .TypeParams -}}
 	[{{- range $index, $param := .TypeParams}}
 			{{- if $index}}, {{end}}{{$param.Name | Exported}} {{$param.TypeString}}
@@ -45,8 +45,8 @@ type {{.MockName}}
 	methodTime    metric.Float64Histogram
 }
 
-// New{{.MockName}} creates a new instrumented wrapper.
-func New{{.MockName}}(
+// New{{.Name}} creates a new instrumented wrapper.
+func New{{.Name}}(
 	impl {{$.SrcPkgQualifier}}{{.InterfaceName}}
 	{{- if .TypeParams -}}
 		[{{- range $index, $param := .TypeParams}}
@@ -56,7 +56,7 @@ func New{{.MockName}}(
 	{{- end}},
 	tracerProvider trace.TracerProvider,
 	meterProvider metric.MeterProvider,
-) (*{{.MockName}}, error)
+) (*{{.Name}}, error)
 {{- if .TypeParams -}}
 	[{{- range $index, $param := .TypeParams}}
 		{{- if $index}}, {{end}}{{$param.Name | Exported}}
@@ -75,7 +75,7 @@ func New{{.MockName}}(
 		return nil, errors.Wrap(err, "create method time histogram")
 	}
 
-	return &{{.MockName}}
+	return &{{.Name}}
 	{{- if .TypeParams -}}
 		[{{- range $index, $param := .TypeParams}}
 			{{- if $index}}, {{end}}{{$param.Name | Exported}}
@@ -91,7 +91,7 @@ func New{{.MockName}}(
 }
 
 // instrument operation call.
-func (i *{{$mock.MockName}}) instrument(ctx context.Context, operation string, err *error) context.CancelFunc {
+func (i *{{$mock.Name}}) instrument(ctx context.Context, operation string, err *error) context.CancelFunc {
 	ctx, span := i.tracer.Start(
 		ctx,
 		fmt.Sprintf("{{.InterfaceName}}.%s", operation), // TODO: Do we really need "{{.InterfaceName}}." prefix?
@@ -133,7 +133,7 @@ func (i *{{$mock.MockName}}) instrument(ctx context.Context, operation string, e
 
 {{range .Methods}}
 // {{.Name}} adds instrumentation and delegates to the underlying implementation.
-func (i *{{$mock.MockName}}
+func (i *{{$mock.Name}}
 {{- if $mock.TypeParams -}}
 	[{{- range $index, $param := $mock.TypeParams}}
 		{{- if $index}}, {{end}}{{$param.Name | Exported}}
