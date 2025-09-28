@@ -11,6 +11,7 @@ import (
 	instrumentationdb "github.com/ernado/example/internal/db/instrumentation"
 	"github.com/ernado/example/internal/handler"
 	"github.com/ernado/example/internal/oas"
+	"github.com/ernado/example/internal/service"
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/app"
 	"github.com/spf13/cobra"
@@ -45,7 +46,7 @@ func Server() *cobra.Command {
 					return errors.Wrap(err, "create db instrumentation layer")
 				}
 				h, err := handler.New(
-					instrumentedDB,
+					service.New(instrumentedDB),
 					t.TracerProvider(),
 					t.MeterProvider(),
 				)

@@ -17,7 +17,7 @@ import (
 var _ oas.Handler = (*Handler)(nil)
 
 type Handler struct {
-	db     example.DB
+	svc    example.Service
 	tracer trace.Tracer
 	meter  metric.Meter
 
@@ -30,7 +30,7 @@ func (h *Handler) GenerateError(ctx context.Context) (*oas.Error, error) {
 	ctx, span := h.tracer.Start(ctx, "GenerateError")
 	defer span.End()
 
-	err := h.db.GenerateError(ctx)
+	err := h.svc.GenerateError(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "generate error")
 	}
@@ -45,7 +45,7 @@ func (h *Handler) CreateTask(ctx context.Context, req *oas.CreateTaskRequest) (*
 	lg := zctx.From(ctx)
 	lg.Info("Creating task", semconv.TaskTitle(req.Title))
 
-	task, err := h.db.CreateTask(ctx, req.Title)
+	task, err := h.svc.CreateTask(ctx, req.Title)
 	if err != nil {
 		return nil, errors.Wrap(err, "create task")
 	}
@@ -59,7 +59,7 @@ func (h *Handler) DeleteTask(ctx context.Context, params oas.DeleteTaskParams) (
 	lg := zctx.From(ctx).With(semconv.TaskID(params.ID))
 	lg.Info("Deleting task")
 
-	err := h.db.DeleteTask(ctx, params.ID)
+	err := h.svc.DeleteTask(ctx, params.ID)
 	if errors.Is(err, example.ErrTaskNotFound) {
 		return nil, &oas.ErrorStatusCode{
 			StatusCode: 200,
@@ -80,7 +80,7 @@ func (h *Handler) DeleteTask(ctx context.Context, params oas.DeleteTaskParams) (
 }
 
 func (h *Handler) ListTasks(ctx context.Context) (*oas.TaskList, error) {
-	tasks, err := h.db.ListTasks(ctx)
+	tasks, err := h.svc.ListTasks(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "list tasks")
 	}
@@ -91,7 +91,7 @@ func (h *Handler) ListTasks(ctx context.Context) (*oas.TaskList, error) {
 }
 
 func New(
-	db example.DB,
+	svc example.Service,
 	tracerProvider trace.TracerProvider,
 	meterProvider metric.MeterProvider,
 ) (*Handler, error) {
@@ -122,7 +122,7 @@ func New(
 	}
 
 	h := &Handler{
-		db:     db,
+		svc:    svc,
 		tracer: tracer,
 		meter:  meter,
 
