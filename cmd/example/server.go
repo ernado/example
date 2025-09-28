@@ -7,12 +7,11 @@ import (
 	"os"
 	"time"
 
-	entdb "github.com/ernado/example/internal/db/ent"
-	instrumentationdb "github.com/ernado/example/internal/db/instrumentation"
+	"github.com/ernado/example/internal/db"
 	"github.com/ernado/example/internal/handler"
+	"github.com/ernado/example/internal/o11y"
 	"github.com/ernado/example/internal/oas"
 	"github.com/ernado/example/internal/service"
-	"github.com/ernado/example/internal/serviceinstrument"
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/app"
 	"github.com/spf13/cobra"
@@ -27,7 +26,7 @@ func Server() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app.Run(func(ctx context.Context, lg *zap.Logger, t *app.Telemetry) error {
 				// TODO: Refactor into Application.
-				entClient, err := entdb.Open(ctx, os.Getenv("DATABASE_URL"), t)
+				entClient, err := db.Open(ctx, os.Getenv("DATABASE_URL"), t)
 				if err != nil {
 					return errors.Wrap(err, "connect to db")
 				}
@@ -37,16 +36,15 @@ func Server() *cobra.Command {
 					return errors.Wrap(err, "migrate schema")
 				}
 
-				db := entdb.New(entClient)
-				instrumentedDB, err := instrumentationdb.NewDBInstrumentation(
-					db,
+				instrumentedDB, err := o11y.NewDBInstrumentation(
+					db.New(entClient),
 					t.TracerProvider(),
 					t.MeterProvider(),
 				)
 				if err != nil {
 					return errors.Wrap(err, "create db instrumentation layer")
 				}
-				instrumentedService, err := serviceinstrument.NewServiceInstrumentation(
+				instrumentedService, err := o11y.NewServiceInstrumentation(
 					service.New(instrumentedDB),
 					t.TracerProvider(),
 					t.MeterProvider(),

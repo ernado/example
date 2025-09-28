@@ -14,7 +14,7 @@ type Task struct {
 // DB represents a database for tasks.
 //
 //go:generate go tool moq -fmt goimports -out ./internal/mock/db.go -pkg mock . DB
-//go:generate go run github.com/ernado/example/internal/otelifacegen -out=./internal/db/instrumentation/instrumentation.go -pkg=instrumentationdb . DB
+//go:generate go run github.com/ernado/example/internal/otelifacegen -out=./internal/o11y/db.go -pkg=o11y . DB
 type DB interface {
 	CreateTask(ctx context.Context, title string) (*Task, error)
 	ListTasks(ctx context.Context) ([]*Task, error)
@@ -25,7 +25,7 @@ type DB interface {
 // Service defines business logic for tasks.
 //
 //go:generate go tool moq -fmt goimports -out ./internal/mock/service.go -pkg mock . Service
-//go:generate go run github.com/ernado/example/internal/otelifacegen -out=./internal/serviceinstrument/instrumentation.go -pkg=serviceinstrument . Service
+//go:generate go run github.com/ernado/example/internal/otelifacegen -out=./internal/o11y/service.go -pkg=o11y . Service
 type Service interface {
 	CreateTask(ctx context.Context, title string) (*Task, error)
 	ListTasks(ctx context.Context) ([]*Task, error)

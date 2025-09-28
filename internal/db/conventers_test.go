@@ -1,4 +1,4 @@
-package entdb
+package db
 
 import (
 	"testing"

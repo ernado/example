@@ -1,5 +1,5 @@
 // Package entdb provides helper for creating pgx dabase for ent.
-package entdb
+package db
 
 import (
 	"context"

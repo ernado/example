@@ -1,4 +1,4 @@
-package entdb
+package db
 
 func (suite *DBTestSuite) TestCreateTask() {
 	ctx := suite.T().Context()
