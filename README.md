@@ -170,25 +170,18 @@ graph TB
     class DB,Ent external
 ```
 
+#### Handlers
 Handlers are implementation of oas handlers. Call services.
 
+Example: `internal/cmd/http/handler/*`.
+
+#### Database
 Model abstracts database entities, i.e. ent client interactions.
 Also model defines entities.
 
+Example: `internal/db/*`.
+
+### Models
 Service implements business logic, i.e. calls models and other services.
 
-Pros
-- Clear separation of concerns
-
-Cons:
-- More boilerplate code
-
-### Direct
-
-Just handlers with business logic and ent client usage.
-
-Pros:
-- Less boilerplate code
-
-Cons:
-- Harder to test
+Example: `internal/service/*`, `task.go` with interfaces.
