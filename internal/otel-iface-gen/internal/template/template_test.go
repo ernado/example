@@ -4,7 +4,7 @@ import (
 	"go/types"
 	"testing"
 
-	"github.com/ernado/example/internal/otelifacegen/internal/registry"
+	"github.com/ernado/example/internal/otel-iface-gen/internal/registry"
 )
 
 func TestTemplateFuncs(t *testing.T) {

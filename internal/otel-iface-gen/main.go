@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ernado/example/internal/otelifacegen/internal/moq"
+	"github.com/ernado/example/internal/otel-iface-gen/internal/moq"
 )
 
 // Version is the command version, injected at build time.

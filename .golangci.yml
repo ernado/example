@@ -52,7 +52,7 @@ linters:
           disabled: true
   exclusions:
     paths-except:
-      - internal/otelifacegen
+      - internal/otel-iface-gen
     generated: lax
     rules:
       - linters:
@@ -66,7 +66,7 @@ linters:
           - lll
           - scopelint
         path: _test\.go
-      - path: internal/otelifacegen
+      - path: internal/otel-iface-gen
         linters: [gocritic, goconst, staticcheck]
       - linters:
           - gocritic

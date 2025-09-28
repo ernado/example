@@ -8,8 +8,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ernado/example/internal/otelifacegen/internal/registry"
-	"github.com/ernado/example/internal/otelifacegen/internal/template"
+	"github.com/ernado/example/internal/otel-iface-gen/internal/registry"
+	"github.com/ernado/example/internal/otel-iface-gen/internal/template"
 )
 
 // Mocker can generate mock structs.

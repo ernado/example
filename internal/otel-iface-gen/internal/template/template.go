@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/ernado/example/internal/otelifacegen/internal/registry"
+	"github.com/ernado/example/internal/otel-iface-gen/internal/registry"
 )
 
 // Template is the instrumentation template. It is capable of generating the

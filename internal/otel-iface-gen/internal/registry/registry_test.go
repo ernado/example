@@ -3,7 +3,7 @@ package registry_test
 import (
 	"testing"
 
-	"github.com/ernado/example/internal/otelifacegen/internal/registry"
+	"github.com/ernado/example/internal/otel-iface-gen/internal/registry"
 )
 
 func BenchmarkNew(b *testing.B) {

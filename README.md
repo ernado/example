@@ -71,6 +71,10 @@ curl -sSf https://atlasgo.sh | sh
 
 OpenAPI specifications.
 
+## _otel
+
+OpenTelemetry Registry files for semantic conventions.
+
 ## generate.go
 
 Code generation entrypoint.
@@ -131,6 +135,24 @@ All commands MUST be here.
 ### SDK
 
 Applications SHOULD use [go-faster/sdk](https://github.com/go-faster/sdk).
+
+## Observability
+
+Schema-driven observability that relies on code generation or
+compile-time checks is preferred.
+
+- [x] Code-generated instrumentation for interfaces
+- [x] Compile-time checks for instrumentation
+- [ ] Code-generated attributes, log fields, spans
+
+Currently, code generation from registry is not implemented.
+
+### otel-iface-gen
+
+Code generation for OpenTelemetry instrumentation boilerplate.
+Used for services and database interfaces.
+
+See `internal/o11y` for generated code.
 
 ## Approaches for structuring application
 

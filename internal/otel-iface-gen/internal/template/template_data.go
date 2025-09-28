@@ -5,7 +5,7 @@ import (
 	"go/types"
 	"strings"
 
-	"github.com/ernado/example/internal/otelifacegen/internal/registry"
+	"github.com/ernado/example/internal/otel-iface-gen/internal/registry"
 )
 
 // Data is the template data used to render the Moq template.
