@@ -46,6 +46,15 @@ type MethodData struct {
 	Returns []ParamData
 }
 
+// ReturnsError returns true if the method returns an error as its last return value.
+func (m MethodData) ReturnsError() bool {
+	if len(m.Returns) == 0 {
+		return false
+	}
+	lastReturn := m.Returns[len(m.Returns)-1]
+	return lastReturn.TypeString() == "error"
+}
+
 // ArgList is the string representation of method parameters, ex:
 // 's string, n int, foo bar.Baz'.
 func (m MethodData) ArgList() string {
@@ -72,12 +81,13 @@ func (m MethodData) ArgCallList() string {
 func (m MethodData) ReturnArgTypeList() string {
 	params := make([]string, len(m.Returns))
 	for i, p := range m.Returns {
-		params[i] = p.TypeString()
+		name := fmt.Sprintf("ret%d", i+1)
+		if p.TypeString() == "error" {
+			name = "err"
+		}
+		params[i] = name + " " + p.TypeString()
 	}
-	if len(m.Returns) > 1 {
-		return fmt.Sprintf("(%s)", strings.Join(params, ", "))
-	}
-	return strings.Join(params, ", ")
+	return fmt.Sprintf("(%s)", strings.Join(params, ", "))
 }
 
 // ReturnArgNameList is the string representation of values being
@@ -106,6 +116,13 @@ type ParamData struct {
 // Name returns the name of the parameter.
 func (p ParamData) Name() string {
 	return p.Var.Name
+}
+
+func (p ParamData) VarName() string {
+	if p.Var.TypeString() == "error" {
+		return "err"
+	}
+	return "ret"
 }
 
 // MethodArg is the representation of the parameter in the function

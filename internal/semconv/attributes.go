@@ -10,12 +10,17 @@ const (
 	AttrTaskID    = "task.id"
 	AttrTaskTitle = "task.title"
 
-	AttrDBOperation = "db.operation"
-	AttrDBResult    = "db.operation.result"
+	AttrOperation = "operation"
+	AttrResult    = "operation.result"
+	AttrSystem    = "operation.system"
 )
 
-func DBOperation(operation string) attribute.KeyValue {
-	return attribute.String(AttrDBOperation, operation)
+func Operation(operation string) attribute.KeyValue {
+	return attribute.String(AttrOperation, operation)
+}
+
+func System(system string) attribute.KeyValue {
+	return attribute.String(AttrSystem, system)
 }
 
 const (
@@ -24,14 +29,14 @@ const (
 	DBResultCanceledValue = "canceled"
 )
 
-func DBResultOk() attribute.KeyValue {
-	return attribute.String(AttrDBResult, DBResultOkValue)
+func ResultOk() attribute.KeyValue {
+	return attribute.String(AttrResult, DBResultOkValue)
 }
 
-func DBResultError() attribute.KeyValue {
-	return attribute.String(AttrDBResult, DBResultErrorValue)
+func ResultError() attribute.KeyValue {
+	return attribute.String(AttrResult, DBResultErrorValue)
 }
 
-func DBResultCanceled() attribute.KeyValue {
-	return attribute.String(AttrDBResult, DBResultCanceledValue)
+func ResultCanceled() attribute.KeyValue {
+	return attribute.String(AttrResult, DBResultCanceledValue)
 }

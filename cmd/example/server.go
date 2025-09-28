@@ -37,7 +37,7 @@ func Server() *cobra.Command {
 				}
 
 				db := entdb.New(entClient)
-				instrumentedDB, err := instrumentationdb.New(
+				instrumentedDB, err := instrumentationdb.NewDBInstrumentation(
 					db,
 					t.TracerProvider(),
 					t.MeterProvider(),

@@ -85,9 +85,18 @@ func (m *Mocker) Mock(w io.Writer, namePairs ...string) error {
 		WithResets: m.cfg.WithResets,
 	}
 
-	if data.MocksSomeMethod() {
-		m.registry.AddImport(types.NewPackage("sync", "sync"))
-	}
+	m.registry.AddImporAlias("go.opentelemetry.io/otel/semconv/v1.34.0", "otelsemconv")
+	m.registry.AddImport(types.NewPackage("go.opentelemetry.io/otel/metric", "metric"))
+	m.registry.AddImport(types.NewPackage("go.opentelemetry.io/otel/trace", "trace"))
+	m.registry.AddImport(types.NewPackage("github.com/go-faster/errors", "errors"))
+	m.registry.AddImport(types.NewPackage("go.opentelemetry.io/otel/semconv/v1.34.0", "otelsemconv"))
+	m.registry.AddImport(types.NewPackage("context", "context"))
+	m.registry.AddImport(types.NewPackage("time", "time"))
+	m.registry.AddImport(types.NewPackage("fmt", "fmt"))
+	m.registry.AddImport(types.NewPackage("go.opentelemetry.io/otel/codes", "codes"))
+	m.registry.AddImport(types.NewPackage("go.opentelemetry.io/otel/attribute", "attribute"))
+	m.registry.AddImport(types.NewPackage("github.com/ernado/example/internal/semconv", "semconv"))
+
 	if m.registry.SrcPkgName() != m.mockPkgName() {
 		data.SrcPkgQualifier = m.registry.SrcPkgName() + "."
 		if !m.cfg.SkipEnsure {
@@ -208,5 +217,5 @@ func parseInterfaceName(namePair string) (ifaceName, mockName string) {
 	}
 
 	ifaceName = parts[0]
-	return ifaceName, ifaceName + "Mock"
+	return ifaceName, ifaceName + "Instrumentation"
 }

@@ -83,6 +83,13 @@ func (r *Registry) MethodScope() *MethodScope {
 	}
 }
 
+func (r *Registry) AddImporAlias(path, alias string) {
+	if r.aliases == nil {
+		r.aliases = map[string]string{}
+	}
+	r.aliases[path] = alias
+}
+
 // AddImport adds the given package to the set of imports. It generates a
 // suitable alias if there are any conflicts with previously imported
 // packages.
