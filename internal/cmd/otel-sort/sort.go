@@ -80,6 +80,7 @@ func main() {
 		panic(err)
 	}
 
+	//#nosec: G306
 	if err := os.WriteFile(arg.File, out, 0o644); err != nil {
 		panic(err)
 	}
