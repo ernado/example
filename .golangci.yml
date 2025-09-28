@@ -51,6 +51,8 @@ linters:
         - name: unused-parameter
           disabled: true
   exclusions:
+    paths-except:
+      - internal/otelifacegen
     generated: lax
     rules:
       - linters:
@@ -64,9 +66,8 @@ linters:
           - lll
           - scopelint
         path: _test\.go
-      - linters:
-          - gosec
-        path: internal/cht
+      - path: internal/otelifacegen
+        linters: [gocritic, goconst, staticcheck]
       - linters:
           - gocritic
         path: _test\.go
