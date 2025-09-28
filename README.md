@@ -2,16 +2,18 @@
 
 Example project with best practices.
 
-| Dependency type | Tool/Library                                      | Description                                    |
-|-----------------|---------------------------------------------------|------------------------------------------------|
-| Runtime         | [go-faster/sdk](https://github.com/go-faster/sdk) | Application SDK with logging, metrics, tracing |
-| Error handling  | [go-faster/errors](github.com/go-faster/errors)   | Error wrapping and handling                    |
-| ORM             | [ent](https://entgo.io/)                          | Entity framework for Go                        |
-| Migrations      | [atlas](https://atlasgo.io/)                      | Database schema migrations and management      |
-| Database        | [PostgreSQL](http://postgresql.org/) 18           | Reliable relational database                   |
-| OpenAPI codegen | [ogen](https://ogen.dev/)                         | OpenAPI v3 code generator for Go               |
-| OpenAPI linter  | [vacuum](https://quobix.com/vacuum/)              | OpenAPI v3 linter                              |
-| Mocks           | [moq](https://github.com/matryer/moq)             | Generate mocks for Go interfaces               |
+| Dependency type            | Tool/Library                                       | Description                                         |
+|----------------------------|----------------------------------------------------|-----------------------------------------------------|
+| Runtime                    | [go-faster/sdk](https://github.com/go-faster/sdk)  | Application SDK with logging, metrics, tracing      |
+| Error handling             | [go-faster/errors](github.com/go-faster/errors)    | Error wrapping and handling                         |
+| ORM                        | [ent](https://entgo.io/)                           | Entity framework for Go                             |
+| Migrations                 | [atlas](https://atlasgo.io/)                       | Database schema migrations and management           |
+| Database                   | [PostgreSQL](http://postgresql.org/) 18            | Reliable relational database                        |
+| OpenAPI codegen            | [ogen](https://ogen.dev/)                          | OpenAPI v3 code generator for Go                    |
+| OpenAPI linter             | [vacuum](https://quobix.com/vacuum/)               | OpenAPI v3 linter                                   |
+| Mocks                      | [moq](https://github.com/matryer/moq)              | Generate mocks for Go interfaces                    |
+| Instrumentation Generation | ./internal/otelifacegen                            | Generate instrumentation boilerplate for interfaces |
+| OpenTelemetry Registry     | [weaver](https://github.com/open-telemetry/weaver) | OpenTelemetry signal registry manipulation          |
 
 ## Installation
 
@@ -185,3 +187,13 @@ Example: `internal/db/*`.
 Service implements business logic, i.e. calls models and other services.
 
 Example: `internal/service/*`, `task.go` with interfaces.
+
+Also contains interfaces abstracting other layers if necessary, e.g. `DB`.
+
+### Generated mocks
+
+Mock generation for interfaces defined on `Models` layer via `moq`.
+
+### Generated Instrumentation
+
+Generated instrumentation for interfaces defined on `Models` layer via `otelifacegen`.
