@@ -85,6 +85,8 @@ func (h *Handler) ListTasks(ctx context.Context) (*oas.TaskList, error) {
 		return nil, errors.Wrap(err, "list tasks")
 	}
 
+	h.tasksReturned.Add(ctx, int64(len(tasks)))
+
 	return &oas.TaskList{
 		Tasks: convertToOASTasks(tasks),
 	}, nil
