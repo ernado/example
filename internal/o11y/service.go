@@ -22,11 +22,11 @@ var _ example.Service = (*ServiceInstrumentation)(nil)
 
 // ServiceInstrumentation wraps example.Service with OpenTelemetry instrumentation.
 type ServiceInstrumentation struct {
-	impl          example.Service
-	tracer        trace.Tracer
-	meter         metric.Meter
-	methodCounter metric.Int64Counter
-	methodTime    metric.Float64Histogram
+	impl             example.Service
+	tracer           trace.Tracer
+	meter            metric.Meter
+	operationCounter metric.Int64Counter
+	operationTime    metric.Float64Histogram
 }
 
 // NewServiceInstrumentation creates a new instrumented wrapper.
@@ -38,12 +38,12 @@ func NewServiceInstrumentation(
 	meter := meterProvider.Meter("github.com/ernado/example")
 	tracer := tracerProvider.Tracer("github.com/ernado/example")
 
-	methodCounter, err := meter.Int64Counter("operation.count")
+	operationCounter, err := meter.Int64Counter("operation.count")
 	if err != nil {
 		return nil, errors.Wrap(err, "create method counter")
 	}
 
-	methodTime, err := meter.Float64Histogram("operation.time")
+	operationTime, err := meter.Float64Histogram("operation.time")
 	if err != nil {
 		return nil, errors.Wrap(err, "create method time histogram")
 	}
@@ -53,8 +53,8 @@ func NewServiceInstrumentation(
 		tracer: tracer,
 		meter:  meter,
 
-		methodCounter: methodCounter,
-		methodTime:    methodTime,
+		operationCounter: operationCounter,
+		operationTime:    operationTime,
 	}, nil
 }
 
@@ -91,8 +91,8 @@ func (i *ServiceInstrumentation) instrument(ctx context.Context, operation strin
 			attributes = append(attributes, semconv.ResultOk())
 		}
 		span.End()
-		i.methodCounter.Add(ctx, 1, metric.WithAttributes(attributes...))
-		i.methodTime.Record(ctx, time.Since(start).Seconds(), metric.WithAttributes(
+		i.operationCounter.Add(ctx, 1, metric.WithAttributes(attributes...))
+		i.operationTime.Record(ctx, time.Since(start).Seconds(), metric.WithAttributes(
 			semconv.Operation(operation),
 			semconv.System("Service"),
 		))
