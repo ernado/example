@@ -24,6 +24,7 @@ require (
 )
 
 tool (
+	entgo.io/ent/cmd/ent
 	github.com/daveshanley/vacuum
 	github.com/matryer/moq
 	github.com/ogen-go/ogen/cmd/ogen
@@ -130,6 +131,7 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
+	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/pb33f/doctor v0.0.39 // indirect
