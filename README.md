@@ -12,7 +12,7 @@ Example project with best practices.
 | OpenAPI codegen            | [ogen](https://ogen.dev/)                          | OpenAPI v3 code generator for Go                    |
 | OpenAPI linter             | [vacuum](https://quobix.com/vacuum/)               | OpenAPI v3 linter                                   |
 | Mocks                      | [moq](https://github.com/matryer/moq)              | Generate mocks for Go interfaces                    |
-| Instrumentation Generation | ./internal/otelifacegen                            | Generate instrumentation boilerplate for interfaces |
+| Instrumentation Generation | ./internal/otel-iface-gen                          | Generate instrumentation boilerplate for interfaces |
 | OpenTelemetry Registry     | [weaver](https://github.com/open-telemetry/weaver) | OpenTelemetry signal registry manipulation          |
 
 ## Installation
