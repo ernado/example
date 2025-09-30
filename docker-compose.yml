@@ -43,6 +43,7 @@ services:
       - OTEL_EXPORTER_OTLP_INSECURE=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otelcol:4317
       - OTEL_RESOURCE_ATTRIBUTES=service.name=go-faster.example.client
+      - OTEL_METRIC_EXPORT_INTERVAL=1000
 
   clickhouse:
     image: "ghcr.io/go-faster/clickhouse-server:23.12"
@@ -66,6 +67,18 @@ services:
     depends_on:
       - clickhouse
 
+  prometheus:
+    image: "ghcr.io/go-faster/prom/prometheus:v3.6.0"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
+      - "--web.enable-otlp-receiver"
+    restart: unless-stopped
+    volumes:
+      - ./_hack/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prom:/prometheus
+
+
   # https://opentelemetry.io/docs/collector/installation/#docker-compose
   otelcol:
     image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.89.0
@@ -85,7 +98,7 @@ services:
       - "--feature-gates=telemetry.useOtelWithSDKConfigurationForInternalTelemetry"
 
   grafana:
-    image: "ghcr.io/go-faster/grafana:11.5.0-pre"
+    image: "ghcr.io/go-faster/grafana:12.2.0-17142428006-ubuntu"
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin

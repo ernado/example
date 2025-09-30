@@ -17,6 +17,8 @@ exporters:
     endpoint: oteldb:4317
     tls:
       insecure: true
+  otlphttp:
+    endpoint: http://prometheus:9090/api/v1/otlp/
 
 extensions:
   health_check:
@@ -33,7 +35,7 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [otlp, otlphttp]
     logs:
       receivers: [otlp]
       processors: [batch]
