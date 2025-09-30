@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -14,6 +17,7 @@ func main() {
 		Migrate(),
 	)
 	if err := root.Execute(); err != nil {
-		panic(err)
+		_, _ = fmt.Fprintf(os.Stderr, "error: %+v\n", err)
+		os.Exit(1)
 	}
 }
