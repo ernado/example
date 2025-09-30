@@ -3,21 +3,22 @@ package db
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-
-	"github.com/ernado/example/internal/ent"
 )
 
 type DBTestSuite struct {
 	suite.Suite
-	ent  *ent.Client
 	db   *DB
 	pgx  *pgx.Conn
 	pool *pgxpool.Pool
@@ -67,11 +68,7 @@ func (suite *DBTestSuite) SetupSuite() {
 
 	suite.T().Logf("Postgres URI: %s", uri)
 
-	client, pool, err := openClient(ctx, uri)
-	suite.Require().NoError(err)
-
-	// Create initial schema.
-	err = client.Schema.Create(ctx)
+	pool, err := openClient(ctx, uri)
 	suite.Require().NoError(err)
 
 	//nolint:nosprintfhostport
@@ -80,42 +77,56 @@ func (suite *DBTestSuite) SetupSuite() {
 	))
 	suite.Require().NoError(err)
 
-	suite.pgx = conn
-	suite.ent = client
-	suite.db = New(suite.ent)
+	suite.db = New(pool)
 	suite.uri = uri
 	suite.pool = pool
+	suite.pgx = conn
+}
+
+func (suite *DBTestSuite) migrate() *migrate.Migrate {
+	//nolint:nosprintfhostport
+	migrateURI := strings.ReplaceAll(suite.uri, "postgres://", "pgx5://")
+	sourceURI := "file://_migrations"
+
+	m, err := migrate.New(sourceURI, migrateURI)
+	suite.Require().NoError(err)
+	return m
+}
+
+func (suite *DBTestSuite) closeMigrate(m *migrate.Migrate) {
+	if m == nil {
+		return
+	}
+	sourceErr, dbErr := m.Close()
+	suite.Require().NoError(sourceErr)
+	suite.Require().NoError(dbErr)
 }
 
 func (suite *DBTestSuite) SetupTest() {
-	ctx := suite.T().Context()
-	err := suite.ent.Schema.Create(ctx)
-	suite.Require().NoError(err)
+	m := suite.migrate()
+	suite.Require().NoError(m.Up())
+	suite.closeMigrate(m)
 }
 
 func (suite *DBTestSuite) TearDownTest() {
-	if suite.ent == nil {
+	if suite.pool == nil {
 		return
 	}
-
-	err := suite.ent.Close()
-	suite.Require().NoError(err)
 
 	suite.pool.Close()
 
 	// Drop and recreate the database for each test.
 	ctx := suite.T().Context()
-	_, err = suite.pgx.Exec(ctx, "DROP DATABASE IF EXISTS test_db")
+	_, err := suite.pgx.Exec(ctx, "DROP DATABASE IF EXISTS test_db")
 	suite.Require().NoError(err)
 	_, err = suite.pgx.Exec(ctx, "CREATE DATABASE test_db WITH OWNER test_user")
 	suite.Require().NoError(err)
 
-	client, pool, err := openClient(ctx, suite.uri)
+	pool, err := openClient(ctx, suite.uri)
 	suite.Require().NoError(err)
 
-	suite.ent = client
 	suite.pool = pool
-	suite.db = New(suite.ent)
+	suite.db = New(suite.pool)
 }
 
 func TestDBTestSuite(t *testing.T) {

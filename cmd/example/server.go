@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ernado/example/internal/db"
@@ -14,6 +15,7 @@ import (
 	"github.com/ernado/example/internal/service"
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/app"
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
@@ -26,18 +28,33 @@ func Server() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app.Run(func(ctx context.Context, lg *zap.Logger, t *app.Telemetry) error {
 				// TODO: Refactor into Application.
-				entClient, err := db.Open(ctx, os.Getenv("DATABASE_URL"), t)
+				pgxPool, err := db.Open(ctx, os.Getenv("DATABASE_URL"), t)
 				if err != nil {
 					return errors.Wrap(err, "connect to db")
 				}
 
-				// TODO: HACK
-				if err := entClient.Schema.Create(ctx); err != nil {
-					return errors.Wrap(err, "migrate schema")
+				{
+					// TODO: extract migration
+					databaseURI := strings.ReplaceAll(os.Getenv("DATABASE_URL"), "postgres://", "pgx5://")
+					sourceURI := "file://_migrations"
+					m, err := migrate.New(sourceURI, databaseURI)
+					if err != nil {
+						return errors.Wrap(err, "create migrate")
+					}
+					if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+						return errors.Wrap(err, "migrate up")
+					}
+					sourceErr, dbErr := m.Close()
+					if sourceErr != nil {
+						return errors.Wrap(sourceErr, "close source")
+					}
+					if dbErr != nil {
+						return errors.Wrap(dbErr, "close db")
+					}
 				}
 
 				instrumentedDB, err := o11y.NewDBInstrumentation(
-					db.New(entClient),
+					db.New(pgxPool),
 					t.TracerProvider(),
 					t.MeterProvider(),
 				)

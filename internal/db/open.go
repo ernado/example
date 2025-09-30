@@ -5,10 +5,7 @@ import (
 	"context"
 	"time"
 
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
 	"github.com/XSAM/otelsql"
-	"github.com/ernado/example/internal/ent"
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/app"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,7 +13,7 @@ import (
 )
 
 // Open new connection.
-func Open(ctx context.Context, uri string, t *app.Telemetry) (*ent.Client, error) {
+func Open(ctx context.Context, uri string, t *app.Telemetry) (*pgxpool.Pool, error) {
 	cfg, err := pgxpool.ParseConfig(uri)
 	if err != nil {
 		return nil, errors.Wrap(err, "pgxpool.ParseConfig")
@@ -37,6 +34,5 @@ func Open(ctx context.Context, uri string, t *app.Telemetry) (*ent.Client, error
 			return nil, errors.Wrap(err, "otelsql.RegisterDBStatsMetrics")
 		}
 	}
-	drv := entsql.OpenDB(dialect.Postgres, db)
-	return ent.NewClient(ent.Driver(drv)), nil
+	return pool, nil
 }

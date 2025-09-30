@@ -11,6 +11,7 @@ func main() {
 	root.AddCommand(
 		Server(),
 		Client(),
+		Migrate(),
 	)
 	if err := root.Execute(); err != nil {
 		panic(err)

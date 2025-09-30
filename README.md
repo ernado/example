@@ -2,26 +2,17 @@
 
 Example project with best practices.
 
-| Dependency type            | Tool/Library                                       | Description                                         |
-|----------------------------|----------------------------------------------------|-----------------------------------------------------|
-| Runtime                    | [go-faster/sdk](https://github.com/go-faster/sdk)  | Application SDK with logging, metrics, tracing      |
-| Error handling             | [go-faster/errors](github.com/go-faster/errors)    | Error wrapping and handling                         |
-| ORM                        | [ent](https://entgo.io/)                           | Entity framework for Go                             |
-| Migrations                 | [atlas](https://atlasgo.io/)                       | Database schema migrations and management           |
-| Database                   | [PostgreSQL](http://postgresql.org/) 18            | Reliable relational database                        |
-| OpenAPI codegen            | [ogen](https://ogen.dev/)                          | OpenAPI v3 code generator for Go                    |
-| OpenAPI linter             | [vacuum](https://quobix.com/vacuum/)               | OpenAPI v3 linter                                   |
-| Mocks                      | [moq](https://github.com/matryer/moq)              | Generate mocks for Go interfaces                    |
-| Instrumentation Generation | ./internal/otel-iface-gen                          | Generate instrumentation boilerplate for interfaces |
-| OpenTelemetry Registry     | [weaver](https://github.com/open-telemetry/weaver) | OpenTelemetry signal registry manipulation          |
-
-## Installation
-
-### atlas
-
-```bash
-curl -sSf https://atlasgo.sh | sh
-```
+| Dependency type            | Tool/Library                                         | Description                                         |
+|----------------------------|------------------------------------------------------|-----------------------------------------------------|
+| Runtime                    | [go-faster/sdk](https://github.com/go-faster/sdk)    | Application SDK with logging, metrics, tracing      |
+| Error handling             | [go-faster/errors](github.com/go-faster/errors)      | Error wrapping and handling                         |
+| Migrations                 | [migrate](https://github.com/golang-migrate/migrate) | Database schema migrations                          |
+| Database                   | [PostgreSQL](http://postgresql.org/) 18              | Reliable relational database                        |
+| OpenAPI codegen            | [ogen](https://ogen.dev/)                            | OpenAPI v3 code generator for Go                    |
+| OpenAPI linter             | [vacuum](https://quobix.com/vacuum/)                 | OpenAPI v3 linter                                   |
+| Mocks                      | [moq](https://github.com/matryer/moq)                | Generate mocks for Go interfaces                    |
+| Instrumentation Generation | ./internal/otel-iface-gen                            | Generate instrumentation boilerplate for interfaces |
+| OpenTelemetry Registry     | [weaver](https://github.com/open-telemetry/weaver)   | OpenTelemetry signal registry manipulation          |
 
 ## Commits
 
@@ -29,36 +20,36 @@ curl -sSf https://atlasgo.sh | sh
 
 ## Structure
 
-| File/Directory       | Description                                                                          |
-|----------------------|--------------------------------------------------------------------------------------|
-| `.github/`           | GitHub workflows and configurations                                                  |
-| `_oas`               | OpenAPI specifications                                                               |
-| `_otel`              | OpenTelemetry Registry                                                               |
-| `cmd/`               | Main applications                                                                    |
-| `pkg/`               | Directory that **MUST NOT** exist                                                    |
-| `internal/`          | Private application and library code. Most code **SHOULD** be here.                  |
-| `.golangci.yml`      | GolangCI-Lint configuration                                                          |
-| `.codecov.yml`       | Codecov configuration                                                                |
-| `.editorconfig`      | Editor configuration                                                                 |
-| `Dockerfile`         | Dockerfile for building the application                                              |
-| `LICENSE`            | License file                                                                         |
-| `Makefile`           | Makefile with common commands                                                        |
-| `README.md`          | This file                                                                            |
-| `generate.go`        | Code generation entrypoint                                                           |
-| `go.coverage.sh`     | Script to generate coverage report                                                   |
-| `go.mod`             | Go module definition. Tools are defined here.                                        |
-| `go.sum`             | Go module checksums                                                                  |
-| `go.test.sh`         | Script to run tests                                                                  |
-| `migrate.Dockerfile` | Docker file for ent migrations                                                       |
-| `AGENTS.md`          | Rules for LLMs. Linked to [copilot-instructions.md](.github/copilot-instructions.md) |
-| .atlas.hcl           | Atlas configuration for ent migrations                                               |
+| File/Directory            | Description                                                                          |
+|---------------------------|--------------------------------------------------------------------------------------|
+| `.github/`                | GitHub workflows and configurations                                                  |
+| `_oas`                    | OpenAPI specifications                                                               |
+| `_otel`                   | OpenTelemetry Registry                                                               |
+| `cmd/`                    | Main applications                                                                    |
+| `pkg/`                    | Directory that **MUST NOT** exist                                                    |
+| `internal/`               | Private application and library code. Most code **SHOULD** be here.                  |
+| `internal/db/_migrations` | Database migrations are placed here                                                  |
+| `.golangci.yml`           | GolangCI-Lint configuration                                                          |
+| `.codecov.yml`            | Codecov configuration                                                                |
+| `.editorconfig`           | Editor configuration                                                                 |
+| `Dockerfile`              | Dockerfile for building the application                                              |
+| `LICENSE`                 | License file                                                                         |
+| `Makefile`                | Makefile with common commands                                                        |
+| `README.md`               | This file                                                                            |
+| `generate.go`             | Code generation entrypoint                                                           |
+| `go.coverage.sh`          | Script to generate coverage report                                                   |
+| `go.mod`                  | Go module definition. Tools are defined here.                                        |
+| `go.sum`                  | Go module checksums                                                                  |
+| `go.test.sh`              | Script to run tests                                                                  |
+| `migrate.Dockerfile`      | Docker file for migrations                                                           |
+| `AGENTS.md`               | Rules for LLMs. Linked to [copilot-instructions.md](.github/copilot-instructions.md) |
 
 ### .github
 
 #### Dependencies files
 
 1. Dependabot configuration files with groups for otel and golang dependencies.
-2. Dependency
+2. Dependency review config for reviewing licenses of dependencies.
 
 #### Workflows
 
@@ -91,41 +82,6 @@ tool github.com/ogen-go/ogen/cmd/ogen
 ## internal
 
 Most code SHOULD be here.
-
-### ent
-
-Ent ORM code.
-
-Note `entc.go` and `generate.go` files.
-
-#### atlas.hcl
-
-Docker engine for atlas is configured as follows:
-
-```hcl
-data "external_schema" "ent" {
-  program = [
-    "go", "tool", "ent", "schema",
-    "./internal/ent/schema",
-    "--dialect", "postgres",
-  ]
-}
-
-env "dev" {
-  dev = "docker://postgres/18/test?search_path=public"
-  src  = data.external_schema.ent.url
-}
-```
-
-To add migration named `some-migration-name`:
-
-```console
-atlas migrate --env dev diff some-migration-name
-```
-
-#### schema
-
-Ent schemas.
 
 ## cmd
 
@@ -166,7 +122,7 @@ graph TB
     Handler --> Service[Services - Controllers]
     Service --> Model[Models]
     Model --> DB[(Database)]
-    Model --> Ent[Ent Client]
+    Model --> pgx[postgresql Client]
 
     subgraph "Application Layers"
         Handler
@@ -176,7 +132,7 @@ graph TB
 
     subgraph "External Dependencies"
         DB
-        Ent
+        pgx
     end
 
     Handler -.-> OAS[OAS Generated Code]
@@ -191,7 +147,7 @@ graph TB
     class Handler handler
     class Service service
     class Model model
-    class DB,Ent external
+    class DB,pgx external
 ```
 
 #### Handlers
@@ -200,7 +156,7 @@ Handlers are implementation of oas handlers. Call services.
 Example: `internal/cmd/http/handler/*`.
 
 #### Database
-Model abstracts database entities, i.e. ent client interactions.
+Model abstracts database entities, i.e. pgx client interactions.
 Also model defines entities.
 
 Example: `internal/db/*`.
