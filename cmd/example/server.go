@@ -16,6 +16,7 @@ import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/sdk/app"
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
@@ -35,9 +36,12 @@ func Server() *cobra.Command {
 
 				{
 					// TODO: extract migration
-					databaseURI := strings.ReplaceAll(os.Getenv("DATABASE_URL"), "postgres://", "pgx5://")
-					sourceURI := "file://_migrations"
-					m, err := migrate.New(sourceURI, databaseURI)
+					d, err := iofs.New(db.Migrations, "_migrations")
+					if err != nil {
+						return errors.Wrap(err, "create iofs driver")
+					}
+					uri := strings.ReplaceAll(os.Getenv("DATABASE_URL"), "postgres://", "pgx5://")
+					m, err := migrate.NewWithSourceInstance("iofs", d, uri)
 					if err != nil {
 						return errors.Wrap(err, "create migrate")
 					}

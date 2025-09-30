@@ -13,6 +13,5 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 COPY --from=builder /app/example /example
-COPY internal/db/_migrations _migrations
 
 ENTRYPOINT ["/example"]

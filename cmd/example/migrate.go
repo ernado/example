@@ -5,10 +5,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ernado/example/internal/db"
 	"github.com/go-faster/errors"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/spf13/cobra"
 )
 
@@ -16,13 +17,15 @@ func Migrate() *cobra.Command {
 	return &cobra.Command{
 		Use: "migrate",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			uri := os.Getenv("DATABASE_URL")
-			uri = strings.ReplaceAll(uri, "postgres://", "pgx5://")
+			d, err := iofs.New(db.Migrations, "_migrations")
+			if err != nil {
+				return errors.Wrap(err, "create iofs driver")
+			}
+			uri := strings.ReplaceAll(os.Getenv("DATABASE_URL"), "postgres://", "pgx5://")
 			if uri == "" {
 				uri = "pgx5://postgres:postgres@localhost:5432/example?sslmode=disable"
 			}
-			sourceURI := "file://internal/dbraw/_migrations"
-			m, err := migrate.New(sourceURI, uri)
+			m, err := migrate.NewWithSourceInstance("iofs", d, uri)
 			if err != nil {
 				return errors.Wrap(err, "create migrate")
 			}
