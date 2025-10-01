@@ -36,7 +36,7 @@ datasources:
     uid: clickhouse
     jsonData:
       port: 9000
-      server: clickhouse
+      server: oteldb
       tlsSkipVerify: true
 
   - name: Prometheus
